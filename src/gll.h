@@ -27,6 +27,8 @@
 typedef struct gll_list gll_list_t;          // Opaque type representing the doubly linked list.
 typedef struct gll_iterator gll_iterator_t;  // Opaque type representing an iterator for the list.
 typedef uintptr_t gll_data_t;                // Type representing the data stored in the list nodes.
+typedef int8_t gll_result_t;
+typedef size_t gll_size_t;
 
 gll_data_t _gll_int_to_data(int data);
 gll_data_t _gll_long_to_data(long data);
@@ -66,7 +68,7 @@ gll_list_t* gll_clone(gll_list_t* list);
  * @param list The list to delete.
  * @return 0 on success, -1 on failure.
  */
-int8_t gll_delete(gll_list_t* list);
+gll_result_t gll_delete(gll_list_t* list);
 
 /**
  * @brief Appends data to the end of the list.
@@ -75,7 +77,7 @@ int8_t gll_delete(gll_list_t* list);
  * @param data The data to append.
  * @return 0 on success, -1 on failure.
  */
-int8_t gll_append(gll_list_t* list, gll_data_t data);
+gll_result_t gll_append(gll_list_t* list, gll_data_t data);
 
 /**
  * @brief Pushes data to the front of the list.
@@ -84,7 +86,7 @@ int8_t gll_append(gll_list_t* list, gll_data_t data);
  * @param data The data to push.
  * @return 0 on success, -1 on failure.
  */
-int8_t gll_push(gll_list_t* list, gll_data_t data);
+gll_result_t gll_push(gll_list_t* list, gll_data_t data);
 
 /**
  * @brief Removes and returns data from the front of the list.
@@ -108,7 +110,7 @@ gll_data_t gll_trim(gll_list_t* list);
  * @param list The list to get the size of.
  * @return The number of elements in the list, or 0 if the list is NULL.
  */
-uint32_t gll_size(gll_list_t* list);
+gll_size_t gll_size(gll_list_t* list);
 
 /**
  * @brief Returns the data at the front of the list without removing it.
@@ -132,7 +134,7 @@ gll_data_t gll_peek_last(gll_list_t* list);
  * @param list The list to clear.
  * @return 0 on success, -1 on failure.
  */
-int8_t gll_clear(gll_list_t* list);
+gll_result_t gll_clear(gll_list_t* list);
 
 /**
  * @brief Creates an iterator for traversing the list.
@@ -148,7 +150,7 @@ gll_iterator_t* gll_iterator_create(gll_list_t* list);
  * @param iterator The iterator to delete.
  * @return 0 on success, -1 on failure.
  */
-int8_t gll_iterator_delete(gll_iterator_t* iterator);
+gll_result_t gll_iterator_delete(gll_iterator_t* iterator);
 
 /**
  * @brief Moves the iterator to the next element in the list and returns its data.
@@ -175,6 +177,6 @@ gll_data_t gll_iterator_prev(gll_iterator_t* iterator);
  * @param iterator The iterator to reset.
  * @return 0 on success, -1 if the iterator is NULL or invalid.
  */
-int8_t gll_iterator_reset(gll_iterator_t* iterator);
+gll_result_t gll_iterator_reset(gll_iterator_t* iterator);
 
 #endif /* GLL_H */

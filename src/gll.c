@@ -32,7 +32,7 @@ typedef struct gll_node
 
 typedef struct gll_list
 {
-    uint32_t qty;
+    gll_size_t qty;
     gll_node_t* head;
     gll_node_t* tail;
 } gll_list_t;
@@ -90,7 +90,7 @@ gll_list_t* gll_clone(gll_list_t* list)
     return clone;
 }
 
-int8_t gll_delete(gll_list_t* list)
+gll_result_t gll_delete(gll_list_t* list)
 {
     if (gll_clear(list)) return -1;
     
@@ -98,7 +98,7 @@ int8_t gll_delete(gll_list_t* list)
     return 0;
 }
 
-int8_t gll_append(gll_list_t* list, gll_data_t data)
+gll_result_t gll_append(gll_list_t* list, gll_data_t data)
 {
     if (!list) return -1;
     
@@ -123,7 +123,7 @@ int8_t gll_append(gll_list_t* list, gll_data_t data)
     return 0;
 }
 
-int8_t gll_push(gll_list_t* list, gll_data_t data)
+gll_result_t gll_push(gll_list_t* list, gll_data_t data)
 {
     if (!list) return -1;
     
@@ -182,7 +182,7 @@ gll_data_t gll_trim(gll_list_t* list)
     return data;
 }
 
-uint32_t gll_size(gll_list_t* list)
+gll_size_t gll_size(gll_list_t* list)
 {
     if (!list) return 0;
     return list->qty;
@@ -208,7 +208,7 @@ gll_data_t gll_peek_last(gll_list_t* list)
     return node->data;
 }
 
-int8_t gll_clear(gll_list_t* list)
+gll_result_t gll_clear(gll_list_t* list)
 {
     if (!list) return -1;
     
@@ -235,7 +235,7 @@ gll_iterator_t* gll_iterator_create(gll_list_t* list)
     iterator->current = list->head;
 }
 
-int8_t gll_iterator_delete(gll_iterator_t* iterator)
+gll_result_t gll_iterator_delete(gll_iterator_t* iterator)
 {
     if (!iterator) return -1;
     
@@ -263,7 +263,7 @@ gll_data_t gll_iterator_prev(gll_iterator_t* iterator)
     return current->data;
 }
 
-int8_t gll_iterator_reset(gll_iterator_t* iterator)
+gll_result_t gll_iterator_reset(gll_iterator_t* iterator)
 {
     if (!iterator) return -1;
     
