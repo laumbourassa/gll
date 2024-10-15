@@ -53,22 +53,22 @@ void print_list(gll_list_t* list, void (*print_func)(gll_data_t))
 // Print functions for different data types
 void print_int(gll_data_t data)
 {
-    printf("%d ", (int)data);
+    printf("%d ", data);
 }
 
 void print_float(gll_data_t data)
 {
-    printf("%.2f ", *(float*)data);
+    printf("%.2f ", GLL_FLOAT(data));
 }
 
 void print_string(gll_data_t data)
 {
-    printf("%s ", (char*)data);
+    printf("%s ", (char*) data);
 }
 
 void print_person_wrapper(gll_data_t data)
 {
-    print_person((person_t*)data);
+    print_person((person_t*) data);
 }
 
 int main(void)
@@ -84,10 +84,9 @@ int main(void)
 
     // 2. Demonstrating usage with floats
     gll_list_t* float_list = gll_create();
-    float f1 = 1.5, f2 = 2.75, f3 = 3.14;
-    gll_append(float_list, GLL_DATA(&f1));
-    gll_append(float_list, GLL_DATA(&f2));
-    gll_append(float_list, GLL_DATA(&f3));
+    gll_append(float_list, GLL_DATA(1.5f));
+    gll_append(float_list, GLL_DATA(2.75f));
+    gll_append(float_list, GLL_DATA(3.14f));
     printf("Float list:\n");
     print_list(float_list, print_float);
     gll_delete(float_list);

@@ -43,6 +43,31 @@ typedef struct gll_iterator
     gll_node_t* current;
 } gll_iterator_t;
 
+gll_data_t _gll_int_to_data(int data)
+{
+    return (gll_data_t) data;
+}
+
+gll_data_t _gll_long_to_data(long data)
+{
+    return (gll_data_t) data;
+}
+
+gll_data_t _gll_float_to_data(float data)
+{
+    return *(gll_data_t*) &data;
+}
+
+gll_data_t _gll_double_to_data(double data)
+{
+    return *(gll_data_t*) &data;
+}
+
+gll_data_t _gll_unknown_to_data(void* data)
+{
+    return (gll_data_t) data;
+}
+
 gll_list_t* gll_create(void)
 {
     return calloc(1, sizeof(gll_list_t));

@@ -24,11 +24,26 @@
 
 #include <stdint.h>
 
-#define GLL_DATA(data)  ((gll_data_t) data)  // Macro to cast data to gll_data_t type.
-
 typedef struct gll_list gll_list_t;          // Opaque type representing the doubly linked list.
 typedef struct gll_iterator gll_iterator_t;  // Opaque type representing an iterator for the list.
 typedef uintptr_t gll_data_t;                // Type representing the data stored in the list nodes.
+
+gll_data_t _gll_int_to_data(int data);
+gll_data_t _gll_long_to_data(long data);
+gll_data_t _gll_float_to_data(float data);
+gll_data_t _gll_double_to_data(double data);
+gll_data_t _gll_unknown_to_data(void* data);
+
+#define GLL_DATA(data)  _Generic((data),        \
+        int: _gll_int_to_data,                  \
+        long: _gll_long_to_data,                \
+        float: _gll_float_to_data,              \
+        double: _gll_double_to_data,            \
+        default: _gll_unknown_to_data           \
+        )(data)
+
+#define GLL_FLOAT(data)         (*(float*) &data)
+#define GLL_DOUBLE(data)        (*(double*) &data)
 
 /**
  * @brief Creates a new doubly linked list.
