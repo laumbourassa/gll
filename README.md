@@ -104,7 +104,7 @@ int main() {
 
 ## License
 
-The GLL library is released under the **GNU General Public License v3.0** or later. You are free to modify and distribute it under the same terms. See [GNU General Public License](https://www.gnu.org/licenses/) for more details.
+The GLL library is released under the **MIT License**. You are free to use, modify, and distribute it under the terms of the license. See the [MIT License](https://opensource.org/licenses/MIT) for more details.
 
 ## Author
 
