@@ -230,9 +230,8 @@ gll_iterator_t* gll_iterator_create(gll_list_t* list)
 {
     if (!list) return NULL;
     
-    gll_iterator_t* iterator = malloc(sizeof(gll_iterator_t));
+    gll_iterator_t* iterator = calloc(1, sizeof(gll_iterator_t));
     iterator->list = list;
-    iterator->current = list->head;
 }
 
 gll_result_t gll_iterator_delete(gll_iterator_t* iterator)
@@ -246,27 +245,43 @@ gll_result_t gll_iterator_delete(gll_iterator_t* iterator)
 gll_data_t gll_iterator_next(gll_iterator_t* iterator)
 {
     if (!iterator) return 0;
+
+    if (iterator->current && iterator->current->next)
+    {
+        iterator->current = iterator->current->next;
+    }
+    else
+    {
+        iterator->current = iterator->list->head;
+    }
+
+    gll_data_t data = iterator->current ? iterator->current->data : 0;
     
-    gll_node_t* current = iterator->current;
-    iterator->current = current->next ? current->next : iterator->list->head;
-    
-    return current->data;
+    return data;
 }
 
 gll_data_t gll_iterator_prev(gll_iterator_t* iterator)
 {
     if (!iterator) return 0;
+
+    if (iterator->current && iterator->current->prev)
+    {
+        iterator->current = iterator->current->prev;
+    }
+    else
+    {
+        iterator->current = iterator->list->tail;
+    }
+
+    gll_data_t data = iterator->current ? iterator->current->data : 0;
     
-    gll_node_t* current = iterator->current;
-    iterator->current = current->prev ? current->prev : iterator->list->tail;
-    
-    return current->data;
+    return data;
 }
 
 gll_result_t gll_iterator_reset(gll_iterator_t* iterator)
 {
     if (!iterator) return -1;
     
-    iterator->current = iterator->list->head;
+    iterator->current = NULL;
     return 0;
 }

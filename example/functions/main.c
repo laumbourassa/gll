@@ -91,6 +91,9 @@ int main(void) {
     }
     printf("\n");
 
+    printf("Reset the iterator\n");
+    gll_iterator_reset(iterator);
+
     printf("Traverse list using iterator (backward):\n");
     for (uint32_t i = 0; i < gll_size(list); i++)
     {
