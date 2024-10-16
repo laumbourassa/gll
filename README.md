@@ -72,12 +72,15 @@ int main() {
 
 - `gll_list_t* gll_clone(gll_list_t* list);`  
   Copies and returns a new instance of a doubly linked list.
-  
+
 - `gll_result_t gll_delete(gll_list_t* list);`  
   Deletes the list and frees all allocated memory.
 
 - `gll_size_t gll_size(gll_list_t* list);`  
   Returns the number of elements in the list.
+
+- `gll_result_t gll_clear(gll_list_t* list);`  
+  Clears all elements from the list, keeping the list structure intact.
 
 #### Data Operations
 - `gll_result_t gll_append(gll_list_t* list, gll_data_t data);`  
@@ -92,15 +95,27 @@ int main() {
 - `gll_data_t gll_trim(gll_list_t* list);`  
   Removes and returns the last element of the list.
 
+- `gll_data_t gll_peek(gll_list_t* list);`  
+  Returns the data at the front of the list without removing it.
+
+- `gll_data_t gll_peek_last(gll_list_t* list);`  
+  Returns the data at the end of the list without removing it.
+
 #### Iterators
 - `gll_iterator_t* gll_iterator_create(gll_list_t* list);`  
   Creates an iterator for traversing the list.
+
+- `gll_result_t gll_iterator_delete(gll_iterator_t* iterator);`  
+  Deletes the iterator and frees the allocated memory.
 
 - `gll_data_t gll_iterator_next(gll_iterator_t* iterator);`  
   Moves the iterator to the next element and returns its data.
 
 - `gll_data_t gll_iterator_prev(gll_iterator_t* iterator);`  
   Moves the iterator to the previous element and returns its data.
+
+- `gll_result_t gll_iterator_reset(gll_iterator_t* iterator);`  
+  Resets the iterator to the start of the list.
 
 ## License
 
