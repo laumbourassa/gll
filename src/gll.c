@@ -64,7 +64,7 @@ gll_data_t _gll_schar_to_data(signed char data)
     return (gll_data_t) data;
 }
 
-gll_data_t _gll_uchar_to_data(signed char data)
+gll_data_t _gll_uchar_to_data(unsigned char data)
 {
     return (gll_data_t) data;
 }
