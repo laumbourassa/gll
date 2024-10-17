@@ -114,11 +114,6 @@ gll_data_t _gll_double_to_data(double data)
     return *(gll_data_t*) &data;
 }
 
-gll_data_t _gll_longdouble_to_data(long double data)
-{
-    return *(gll_data_t*) &data;
-}
-
 gll_data_t _gll_voidptr_to_data(void* data)
 {
     return (gll_data_t) data;

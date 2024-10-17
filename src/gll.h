@@ -54,7 +54,7 @@ gll_data_t _gll_longlong_to_data(long long data);
 gll_data_t _gll_ulonglong_to_data(unsigned long long data);
 gll_data_t _gll_float_to_data(float data);
 gll_data_t _gll_double_to_data(double data);
-gll_data_t _gll_longdouble_to_data(long double data);
+//gll_data_t _gll_longdouble_to_data(long double data); // Long double can be larger than gll_data_t
 gll_data_t _gll_voidptr_to_data(void* data);
 
 #define GLL_DATA(data)  _Generic((data),                \
@@ -70,7 +70,6 @@ gll_data_t _gll_voidptr_to_data(void* data);
         unsigned long long: _gll_ulonglong_to_data,     \
         float: _gll_float_to_data,                      \
         double: _gll_double_to_data,                    \
-        long double: _gll_longdouble_to_data,           \
         default: _gll_voidptr_to_data                   \
         )(data)
 
