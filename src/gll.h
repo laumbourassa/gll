@@ -44,7 +44,7 @@ typedef gll_result_t (*gll_comparator_t)(gll_data_t data1, gll_data_t data2);   
 // Conversion functions for various types to gll_data_t
 gll_data_t _gll_char_to_data(char data);
 gll_data_t _gll_schar_to_data(signed char data);
-gll_data_t _gll_uchar_to_data(signed char data);
+gll_data_t _gll_uchar_to_data(unsigned char data);
 gll_data_t _gll_short_to_data(short data);
 gll_data_t _gll_int_to_data(int data);
 gll_data_t _gll_uint_to_data(unsigned int data);
