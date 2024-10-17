@@ -36,6 +36,11 @@ typedef struct person
     char name[50];
 } person_t;
 
+void person_deallocator(gll_data_t data)
+{
+    free((person_t*) data);
+}
+
 // Helper function to print the custom structure
 void print_person(person_t* person)
 {
@@ -85,7 +90,7 @@ int main(void)
     gll_append(int_list, GLL_DATA(30));
     printf("Integer list:\n");
     print_list(int_list, print_int);
-    gll_delete(int_list);
+    gll_delete(int_list, NULL);
 
     // 2. Demonstrating usage with floats
     gll_list_t* float_list = gll_create();
@@ -94,7 +99,7 @@ int main(void)
     gll_append(float_list, GLL_DATA(3.14f));
     printf("Float list:\n");
     print_list(float_list, print_float);
-    gll_delete(float_list);
+    gll_delete(float_list, NULL);
 
     // 3. Demonstrating usage with strings
     gll_list_t* string_list = gll_create();
@@ -103,7 +108,7 @@ int main(void)
     gll_append(string_list, GLL_DATA("GLL"));
     printf("String list:\n");
     print_list(string_list, print_string);
-    gll_delete(string_list);
+    gll_delete(string_list, NULL);
 
     // 4. Demonstrating usage with custom structures
     gll_list_t* person_list = gll_create();
@@ -128,14 +133,9 @@ int main(void)
     
     printf("Custom structure list (Persons):\n");
     print_list(person_list, print_person_wrapper);
-    
-    // Free allocated memory for custom structures
-    free(p1);
-    free(p2);
-    free(p3);
 
     // Deleting the person list
-    gll_delete(person_list);
+    gll_delete(person_list, person_deallocator);
 
     printf("All lists have been processed and deleted.\n");
     

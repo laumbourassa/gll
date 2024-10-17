@@ -32,21 +32,46 @@
 typedef struct gll_list gll_list_t;          // Opaque type representing the doubly linked list.
 typedef struct gll_iterator gll_iterator_t;  // Opaque type representing an iterator for the list.
 typedef uintptr_t gll_data_t;                // Type representing the data stored in the list nodes.
-typedef int8_t gll_result_t;
+typedef int8_t gll_status_t;
+typedef int32_t gll_result_t;
 typedef size_t gll_size_t;
+typedef size_t gll_index_t;
 
+typedef void (*gll_deallocator_t)(gll_data_t data);                             // User-provided deallocator function for custom structures
+typedef gll_result_t (*gll_comparator_t)(gll_data_t data1, gll_data_t data2);   // User-provided comparator function for custom structures
+                                                                                // Returns positive value if data1 > data2, negative if data1 < data2, 0 if equal
+
+// Conversion functions for various types to gll_data_t
+gll_data_t _gll_char_to_data(char data);
+gll_data_t _gll_schar_to_data(signed char data);
+gll_data_t _gll_uchar_to_data(signed char data);
+gll_data_t _gll_short_to_data(short data);
 gll_data_t _gll_int_to_data(int data);
+gll_data_t _gll_uint_to_data(unsigned int data);
 gll_data_t _gll_long_to_data(long data);
+gll_data_t _gll_ulong_to_data(unsigned long data);
+gll_data_t _gll_longlong_to_data(long long data);
+gll_data_t _gll_ulonglong_to_data(unsigned long long data);
 gll_data_t _gll_float_to_data(float data);
 gll_data_t _gll_double_to_data(double data);
-gll_data_t _gll_unknown_to_data(void* data);
+gll_data_t _gll_longdouble_to_data(long double data);
+gll_data_t _gll_voidptr_to_data(void* data);
 
-#define GLL_DATA(data)  _Generic((data),        \
-        int: _gll_int_to_data,                  \
-        long: _gll_long_to_data,                \
-        float: _gll_float_to_data,              \
-        double: _gll_double_to_data,            \
-        default: _gll_unknown_to_data           \
+#define GLL_DATA(data)  _Generic((data),                \
+        char: _gll_char_to_data,                        \
+        signed char: _gll_schar_to_data,                \
+        unsigned char: _gll_uchar_to_data,              \
+        short: _gll_short_to_data,                      \
+        int: _gll_int_to_data,                          \
+        unsigned int: _gll_uint_to_data,                \
+        long: _gll_long_to_data,                        \
+        unsigned long: _gll_ulong_to_data,              \
+        long long: _gll_longlong_to_data,               \
+        unsigned long long: _gll_ulonglong_to_data,     \
+        float: _gll_float_to_data,                      \
+        double: _gll_double_to_data,                    \
+        long double: _gll_longdouble_to_data,           \
+        default: _gll_voidptr_to_data                   \
         )(data)
 
 #define GLL_FLOAT(data)         (*(float*) &data)
@@ -71,9 +96,10 @@ gll_list_t* gll_clone(gll_list_t* list);
  * @brief Deletes the entire list and frees all allocated memory.
  * 
  * @param list The list to delete.
+ * @param deallocator Function to deallocate any custom data, or NULL.
  * @return 0 on success, -1 on failure.
  */
-gll_result_t gll_delete(gll_list_t* list);
+gll_status_t gll_delete(gll_list_t* list, gll_deallocator_t deallocator);
 
 /**
  * @brief Appends data to the end of the list.
@@ -82,7 +108,7 @@ gll_result_t gll_delete(gll_list_t* list);
  * @param data The data to append.
  * @return 0 on success, -1 on failure.
  */
-gll_result_t gll_append(gll_list_t* list, gll_data_t data);
+gll_status_t gll_append(gll_list_t* list, gll_data_t data);
 
 /**
  * @brief Pushes data to the front of the list.
@@ -91,7 +117,7 @@ gll_result_t gll_append(gll_list_t* list, gll_data_t data);
  * @param data The data to push.
  * @return 0 on success, -1 on failure.
  */
-gll_result_t gll_push(gll_list_t* list, gll_data_t data);
+gll_status_t gll_push(gll_list_t* list, gll_data_t data);
 
 /**
  * @brief Removes and returns data from the front of the list.
@@ -134,12 +160,41 @@ gll_data_t gll_peek(gll_list_t* list);
 gll_data_t gll_peek_last(gll_list_t* list);
 
 /**
+ * @brief Finds the index of the first occurrence of data in the list.
+ * 
+ * @param list The list to search.
+ * @param data The data to find.
+ * @return The index of the found data or -1 if not found or the list is NULL.
+ */
+gll_index_t gll_find(gll_list_t* list, gll_data_t data);
+
+/**
+ * @brief Inserts data at a specified index in the list.
+ * 
+ * @param list The list to insert data into.
+ * @param index The index where data should be inserted.
+ * @param data The data to insert.
+ * @return 0 on success, -1 on failure.
+ */
+gll_status_t gll_insert(gll_list_t* list , gll_index_t index, gll_data_t data);
+
+/**
+ * @brief Removes and returns the data at a specified index in the list.
+ * 
+ * @param list The list to remove data from.
+ * @param index The index of the data to remove.
+ * @return The removed data or 0 if the list is empty or the index is invalid.
+ */
+gll_data_t gll_remove(gll_list_t* list, gll_index_t index);
+
+/**
  * @brief Clears all elements from the list but keeps the list structure.
  * 
  * @param list The list to clear.
+ * @param deallocator Function to deallocate any custom data, or NULL.
  * @return 0 on success, -1 on failure.
  */
-gll_result_t gll_clear(gll_list_t* list);
+gll_status_t gll_clear(gll_list_t* list, gll_deallocator_t deallocator);
 
 /**
  * @brief Creates an iterator for traversing the list.
@@ -155,7 +210,7 @@ gll_iterator_t* gll_iterator_create(gll_list_t* list);
  * @param iterator The iterator to delete.
  * @return 0 on success, -1 on failure.
  */
-gll_result_t gll_iterator_delete(gll_iterator_t* iterator);
+gll_status_t gll_iterator_delete(gll_iterator_t* iterator);
 
 /**
  * @brief Moves the iterator to the next element in the list and returns its data.
@@ -176,12 +231,45 @@ gll_data_t gll_iterator_prev(gll_iterator_t* iterator);
 /**
  * @brief Resets the iterator to the start of the list.
  * 
- * This function moves the iterator back to the first element (head) of the list,
- * allowing for a new traversal from the beginning.
- * 
  * @param iterator The iterator to reset.
  * @return 0 on success, -1 if the iterator is NULL or invalid.
  */
-gll_result_t gll_iterator_reset(gll_iterator_t* iterator);
+gll_status_t gll_iterator_reset(gll_iterator_t* iterator);
+
+/**
+ * @brief Compares two 32-bit integers.
+ * 
+ * @param data1 The first data value to compare.
+ * @param data2 The second data value to compare.
+ * @return Positive if data1 > data2, negative if data1 < data2, 0 if equal.
+ */
+gll_result_t gll_comparator_int32(gll_data_t data1, gll_data_t data2);
+
+/**
+ * @brief Compares two 32-bit unsigned integers.
+ * 
+ * @param data1 The first data value to compare.
+ * @param data2 The second data value to compare.
+ * @return Positive if data1 > data2, negative if data1 < data2, 0 if equal.
+ */
+gll_result_t gll_comparator_uint32(gll_data_t data1, gll_data_t data2);
+
+/**
+ * @brief Compares two floating-point values.
+ * 
+ * @param data1 The first data value to compare.
+ * @param data2 The second data value to compare.
+ * @return Positive if data1 > data2, negative if data1 < data2, 0 if equal.
+ */
+gll_result_t gll_comparator_float(gll_data_t data1, gll_data_t data2);
+
+/**
+ * @brief Compares two double-precision floating-point values.
+ * 
+ * @param data1 The first data value to compare.
+ * @param data2 The second data value to compare.
+ * @return Positive if data1 > data2, negative if data1 < data2, 0 if equal.
+ */
+gll_result_t gll_comparator_double(gll_data_t data1, gll_data_t data2);
 
 #endif /* GLL_H */

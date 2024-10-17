@@ -25,6 +25,7 @@
  */
 
 #include <stdlib.h>
+#include <stdio.h>
 #include "gll.h"
 
 typedef struct gll_node gll_node_t;
@@ -48,12 +49,57 @@ typedef struct gll_iterator
     gll_node_t* current;
 } gll_iterator_t;
 
+static gll_status_t _gll_insert_from_head(gll_list_t* list, gll_index_t index, gll_data_t data);
+static gll_status_t _gll_insert_from_tail(gll_list_t* list, gll_index_t index, gll_data_t data);
+static gll_data_t _gll_remove_from_head(gll_list_t* list, gll_index_t index);
+static gll_data_t _gll_remove_from_tail(gll_list_t* list, gll_index_t index);
+
+gll_data_t _gll_char_to_data(char data)
+{
+    return (gll_data_t) data;
+}
+
+gll_data_t _gll_schar_to_data(signed char data)
+{
+    return (gll_data_t) data;
+}
+
+gll_data_t _gll_uchar_to_data(signed char data)
+{
+    return (gll_data_t) data;
+}
+
+gll_data_t _gll_short_to_data(short data)
+{
+    return (gll_data_t) data;
+}
+
 gll_data_t _gll_int_to_data(int data)
 {
     return (gll_data_t) data;
 }
 
+gll_data_t _gll_uint_to_data(unsigned int data)
+{
+    return (gll_data_t) data;
+}
+
 gll_data_t _gll_long_to_data(long data)
+{
+    return (gll_data_t) data;
+}
+
+gll_data_t _gll_ulong_to_data(unsigned long data)
+{
+    return (gll_data_t) data;
+}
+
+gll_data_t _gll_longlong_to_data(long long data)
+{
+    return (gll_data_t) data;
+}
+
+gll_data_t _gll_ulonglong_to_data(unsigned long long data)
 {
     return (gll_data_t) data;
 }
@@ -68,7 +114,12 @@ gll_data_t _gll_double_to_data(double data)
     return *(gll_data_t*) &data;
 }
 
-gll_data_t _gll_unknown_to_data(void* data)
+gll_data_t _gll_longdouble_to_data(long double data)
+{
+    return *(gll_data_t*) &data;
+}
+
+gll_data_t _gll_voidptr_to_data(void* data)
 {
     return (gll_data_t) data;
 }
@@ -84,9 +135,9 @@ gll_list_t* gll_clone(gll_list_t* list)
     
     gll_list_t* clone = calloc(1, sizeof(gll_list_t));
     gll_iterator_t* iterator = gll_iterator_create(list);
-    uint32_t size = gll_size(list);
+    gll_size_t size = gll_size(list);
     
-    for(uint32_t i = 0 ; i < size ; i++)
+    for(gll_index_t i = 0 ; i < size ; i++)
     {
         gll_append(clone, gll_iterator_next(iterator));
     }
@@ -95,15 +146,15 @@ gll_list_t* gll_clone(gll_list_t* list)
     return clone;
 }
 
-gll_result_t gll_delete(gll_list_t* list)
+gll_status_t gll_delete(gll_list_t* list, gll_deallocator_t deallocator)
 {
-    if (gll_clear(list)) return -1;
+    if (gll_clear(list, deallocator)) return -1;
     
     free(list);
     return 0;
 }
 
-gll_result_t gll_append(gll_list_t* list, gll_data_t data)
+gll_status_t gll_append(gll_list_t* list, gll_data_t data)
 {
     if (!list) return -1;
     
@@ -128,7 +179,7 @@ gll_result_t gll_append(gll_list_t* list, gll_data_t data)
     return 0;
 }
 
-gll_result_t gll_push(gll_list_t* list, gll_data_t data)
+gll_status_t gll_push(gll_list_t* list, gll_data_t data)
 {
     if (!list) return -1;
     
@@ -213,16 +264,106 @@ gll_data_t gll_peek_last(gll_list_t* list)
     return node->data;
 }
 
-gll_result_t gll_clear(gll_list_t* list)
+// Returns the list size if data isn't found
+gll_index_t gll_find(gll_list_t* list, gll_data_t data)
+{
+    if (!list) return 0;
+    if (!list->head) return 0;
+
+    gll_iterator_t* iterator = gll_iterator_create(list);
+    gll_index_t index = 0;
+
+    for (; index < list->qty; index++)
+    {
+        if (data == gll_iterator_next(iterator))
+        {
+            break;
+        }
+    }
+
+    gll_iterator_delete(iterator);
+
+    return index;
+}
+
+gll_status_t gll_insert(gll_list_t* list, gll_index_t index, gll_data_t data)
+{
+    if (!list) return -1;
+    if (index > list->qty) return -1;
+
+    gll_status_t status = 0;
+
+    if (index == 0)
+    {
+        // Insert at the head
+        status = gll_push(list, data);
+    }
+    else if (index == list->qty)
+    {
+        // Insert at the tail
+        status = gll_append(list, data);
+    }
+    else if (list->qty/2 >= index)
+    {
+        // Index is in the first half
+        status = _gll_insert_from_head(list, index, data);
+    }
+    else
+    {
+        // Index is in the second half
+        status = _gll_insert_from_tail(list, index, data);
+    }
+
+    return status;
+}
+
+gll_data_t gll_remove(gll_list_t* list, gll_index_t index)
+{
+    if (!list) return -1;
+    if (index > list->qty) return -1;
+
+    gll_data_t data = 0;
+
+    if (index == 0)
+    {
+        // Remove at the head
+        data = gll_pop(list);
+    }
+    else if (index == list->qty)
+    {
+        // Remove at the tail
+        data = gll_trim(list);
+    }
+    else if (list->qty/2 >= index)
+    {
+        // Index is in the first half
+        data = _gll_remove_from_head(list, index);
+    }
+    else
+    {
+        // Index is in the second half
+        data = _gll_remove_from_tail(list, index);
+    }
+
+    return data;
+}
+
+gll_status_t gll_clear(gll_list_t* list, gll_deallocator_t deallocator)
 {
     if (!list) return -1;
     
     gll_node_t* node = list->head;
     
-    for (uint32_t i = 0; i < list->qty; i++)
+    for (gll_index_t i = 0; i < list->qty; i++)
     {
         if (!node) return -1;
         gll_node_t* next = node->next;
+
+        if(deallocator && node->data)
+        {
+            deallocator(node->data);
+        }
+
         free(node);
         node = next;
     }
@@ -239,7 +380,7 @@ gll_iterator_t* gll_iterator_create(gll_list_t* list)
     iterator->list = list;
 }
 
-gll_result_t gll_iterator_delete(gll_iterator_t* iterator)
+gll_status_t gll_iterator_delete(gll_iterator_t* iterator)
 {
     if (!iterator) return -1;
     
@@ -283,10 +424,145 @@ gll_data_t gll_iterator_prev(gll_iterator_t* iterator)
     return data;
 }
 
-gll_result_t gll_iterator_reset(gll_iterator_t* iterator)
+gll_status_t gll_iterator_reset(gll_iterator_t* iterator)
 {
     if (!iterator) return -1;
     
     iterator->current = NULL;
     return 0;
+}
+
+gll_result_t gll_comparator_int32(gll_data_t data1, gll_data_t data2)
+{
+    return data1 - data2;
+}
+
+gll_result_t gll_comparator_uint32(gll_data_t data1, gll_data_t data2)
+{
+    if (data1 > data2)
+    {
+        return 1;
+    }
+    else if (data1 < data2)
+    {
+        return -1;
+    }
+    
+    return 0;
+}
+
+gll_result_t gll_comparator_float(gll_data_t data1, gll_data_t data2)
+{
+    if (GLL_FLOAT(data1) > GLL_FLOAT(data2))
+    {
+        return 1;
+    }
+    else if (GLL_FLOAT(data1) < GLL_FLOAT(data2))
+    {
+        return -1;
+    }
+    
+    return 0;
+}
+
+gll_result_t gll_comparator_double(gll_data_t data1, gll_data_t data2)
+{
+    if (GLL_DOUBLE(data1) > GLL_DOUBLE(data2))
+    {
+        return 1;
+    }
+    else if (GLL_DOUBLE(data1) < GLL_DOUBLE(data2))
+    {
+        return -1;
+    }
+    
+    return 0;
+}
+
+static gll_status_t _gll_insert_from_head(gll_list_t* list, gll_index_t index, gll_data_t data)
+{
+    gll_iterator_t* iterator = gll_iterator_create(list);
+
+    for (gll_index_t i = 0; i <= index; i++)
+    {
+        gll_iterator_next(iterator);
+    }
+
+    gll_node_t* node = calloc(1, sizeof(gll_node_t));
+    node->data = data;
+
+    node->next = iterator->current;
+    node->prev = iterator->current->prev;
+    iterator->current->prev->next = node;
+    iterator->current->prev = node;
+    list->qty++;
+
+    gll_iterator_delete(iterator);
+
+    return 0;
+}
+
+static gll_status_t _gll_insert_from_tail(gll_list_t* list, gll_index_t index, gll_data_t data)
+{
+    gll_iterator_t* iterator = gll_iterator_create(list);
+
+    for (gll_index_t i = list->qty - 1; i >= index; i--)
+    {
+        gll_iterator_prev(iterator);
+    }
+
+    gll_node_t* node = calloc(1, sizeof(gll_node_t));
+    node->data = data;
+
+    node->next = iterator->current;
+    node->prev = iterator->current->prev;
+    iterator->current->prev->next = node;
+    iterator->current->prev = node;
+    list->qty++;
+
+    gll_iterator_delete(iterator);
+
+    return 0;
+}
+
+static gll_data_t _gll_remove_from_head(gll_list_t* list, gll_index_t index)
+{
+    gll_data_t data = 0;
+    gll_iterator_t* iterator = gll_iterator_create(list);
+
+    for (gll_index_t i = 0; i <= index; i++)
+    {
+        gll_iterator_next(iterator);
+    }
+
+    iterator->current->prev->next = iterator->current->next;
+    iterator->current->next->prev = iterator->current->prev;
+    list->qty--;
+
+    data = iterator->current->data;
+
+    gll_iterator_delete(iterator);
+
+    return data;
+}
+
+static gll_data_t _gll_remove_from_tail(gll_list_t* list, gll_index_t index)
+{
+    gll_data_t data = 0;
+    gll_iterator_t* iterator = gll_iterator_create(list);
+
+    for (gll_index_t i = list->qty - 1; i >= index; i--)
+    {
+        gll_iterator_prev(iterator);
+    }
+
+    iterator->current->prev->next = iterator->current->next;
+    iterator->current->next->prev = iterator->current->prev;
+    list->qty--;
+
+    data = iterator->current->data;
+
+    gll_iterator_delete(iterator);
+
+    return data;
 }

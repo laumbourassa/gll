@@ -62,6 +62,10 @@ int main(void) {
     printf("After pushing 0 to the front:\n");
     print_list(list);
 
+    gll_insert(list, 2, GLL_DATA(42));
+    printf("After inserting 42 in index 2:\n");
+    print_list(list);
+
     // Pop element from the front
     gll_data_t popped = gll_pop(list);
     printf("Popped from front: %lu\n", (unsigned long)popped);
@@ -70,6 +74,10 @@ int main(void) {
     // Trim element from the end
     gll_data_t trimmed = gll_trim(list);
     printf("Trimmed from end: %lu\n", (unsigned long)trimmed);
+    print_list(list);
+
+    gll_data_t removed = gll_remove(list, 1);
+    printf("Removed from index 1: %lu\n", (unsigned long)removed);
     print_list(list);
 
     // Peek at the first and last elements
@@ -83,7 +91,7 @@ int main(void) {
     print_list(cloned_list);
 
     // Clear the cloned list
-    gll_clear(cloned_list);
+    gll_clear(cloned_list, NULL);
     printf("Cleared the cloned list:\n");
     print_list(cloned_list);
 
@@ -109,8 +117,8 @@ int main(void) {
     gll_iterator_delete(iterator);
 
     // Delete the lists
-    gll_delete(list);
-    gll_delete(cloned_list);
+    gll_delete(list, NULL);
+    gll_delete(cloned_list, NULL);
 
     printf("All lists and iterators have been deleted.\n");
     
