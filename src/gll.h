@@ -163,7 +163,7 @@ gll_data_t gll_peek_last(gll_list_t* list);
  * 
  * @param list The list to search.
  * @param data The data to find.
- * @return The index of the found data or -1 if not found or the list is NULL.
+ * @return The index of the found data or, 0 if NULL list, list size if not found.
  */
 gll_index_t gll_find(gll_list_t* list, gll_data_t data);
 
