@@ -271,9 +271,12 @@ gll_index_t gll_find(gll_list_t* list, gll_data_t data, gll_comparator_t compara
     {
         gll_data_t eval = gll_iterator_next(iterator);
 
-        if (comparator && !comparator(data, eval))
+        if (comparator)
         {
-            break;
+            if (!comparator(data, eval))
+            {
+                break;
+            }
         }
         else if (data == eval)
         {
