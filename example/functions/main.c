@@ -121,8 +121,8 @@ int main(void) {
     gll_iterator_delete(iterator);
 
     // Delete the lists
-    gll_delete(list, NULL);
-    gll_delete(cloned_list, NULL);
+    gll_destroy(list, NULL);
+    gll_destroy(cloned_list, NULL);
 
     printf("All lists and iterators have been deleted.\n");
     

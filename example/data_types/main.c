@@ -90,7 +90,7 @@ int main(void)
     gll_append(int_list, GLL_DATA(30));
     printf("Integer list:\n");
     print_list(int_list, print_int);
-    gll_delete(int_list, NULL);
+    gll_destroy(int_list, NULL);
 
     // 2. Demonstrating usage with floats
     gll_list_t* float_list = gll_create();
@@ -99,7 +99,7 @@ int main(void)
     gll_append(float_list, GLL_DATA(3.14f));
     printf("Float list:\n");
     print_list(float_list, print_float);
-    gll_delete(float_list, NULL);
+    gll_destroy(float_list, NULL);
 
     // 3. Demonstrating usage with strings
     gll_list_t* string_list = gll_create();
@@ -108,7 +108,7 @@ int main(void)
     gll_append(string_list, GLL_DATA("GLL"));
     printf("String list:\n");
     print_list(string_list, print_string);
-    gll_delete(string_list, NULL);
+    gll_destroy(string_list, NULL);
 
     // 4. Demonstrating usage with custom structures
     gll_list_t* person_list = gll_create();
@@ -135,7 +135,7 @@ int main(void)
     print_list(person_list, print_person_wrapper);
 
     // Deleting the person list
-    gll_delete(person_list, person_deallocator);
+    gll_destroy(person_list, person_deallocator);
 
     printf("All lists have been processed and deleted.\n");
     

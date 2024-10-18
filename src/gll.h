@@ -92,13 +92,13 @@ gll_list_t* gll_create(void);
 gll_list_t* gll_clone(gll_list_t* list);
 
 /**
- * @brief Deletes the entire list and frees all allocated memory.
+ * @brief Destroys the entire list and frees all allocated memory.
  * 
- * @param list The list to delete.
+ * @param list The list to destroy.
  * @param deallocator Function to deallocate any custom data, or NULL.
  * @return 0 on success, -1 on failure.
  */
-gll_status_t gll_delete(gll_list_t* list, gll_deallocator_t deallocator);
+gll_status_t gll_destroy(gll_list_t* list, gll_deallocator_t deallocator);
 
 /**
  * @brief Appends data to the end of the list.

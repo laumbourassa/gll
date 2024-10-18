@@ -141,7 +141,7 @@ gll_list_t* gll_clone(gll_list_t* list)
     return clone;
 }
 
-gll_status_t gll_delete(gll_list_t* list, gll_deallocator_t deallocator)
+gll_status_t gll_destroy(gll_list_t* list, gll_deallocator_t deallocator)
 {
     if (gll_clear(list, deallocator)) return -1;
     
