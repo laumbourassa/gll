@@ -49,7 +49,7 @@ typedef struct gll_iterator
     gll_node_t* current;
 } gll_iterator_t;
 
-static gll_result_t _gll_comparator_data(gll_data_t data1, gll_data_t data2);
+static gll_result_t _gll_comparator_data_not_equal(gll_data_t data1, gll_data_t data2);
 static gll_status_t _gll_insert_from_head(gll_list_t* list, gll_index_t index, gll_data_t data);
 static gll_status_t _gll_insert_from_tail(gll_list_t* list, gll_index_t index, gll_data_t data);
 static gll_data_t _gll_remove_from_head(gll_list_t* list, gll_index_t index);
@@ -267,7 +267,8 @@ gll_index_t gll_find(gll_list_t* list, gll_data_t data, gll_comparator_t compara
 
     if (!comparator)
     {
-        comparator = _gll_comparator_data;
+        // The result of this comparator will be inverted
+        comparator = _gll_comparator_data_not_equal;
     }
 
     gll_iterator_t* iterator = gll_iterator_create(list);
@@ -481,18 +482,10 @@ gll_result_t gll_comparator_double(gll_data_t data1, gll_data_t data2)
     return 0;
 }
 
-static gll_result_t _gll_comparator_data(gll_data_t data1, gll_data_t data2)
+static gll_result_t _gll_comparator_data_not_equal(gll_data_t data1, gll_data_t data2)
 {
-    if (data1 > data2)
-    {
-        return 1;
-    }
-    else if (data1 < data2)
-    {
-        return -1;
-    }
-    
-    return 0;
+    // Returns 0 if equal, else 1
+    return data1 != data2;
 }
 
 static gll_status_t _gll_insert_from_head(gll_list_t* list, gll_index_t index, gll_data_t data)
