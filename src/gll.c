@@ -264,6 +264,11 @@ gll_index_t gll_find(gll_list_t* list, gll_data_t data, gll_comparator_t compara
     if (!list) return 0;
     if (!list->head) return 0;
 
+    if (!comparator)
+    {
+        comparator = gll_comparator_int32;
+    }
+
     gll_iterator_t* iterator = gll_iterator_create(list);
     gll_index_t index = 0;
 
@@ -271,14 +276,7 @@ gll_index_t gll_find(gll_list_t* list, gll_data_t data, gll_comparator_t compara
     {
         gll_data_t eval = gll_iterator_next(iterator);
 
-        if (comparator)
-        {
-            if (!comparator(data, eval))
-            {
-                break;
-            }
-        }
-        else if (data == eval)
+        if (!comparator(data, eval))
         {
             break;
         }
