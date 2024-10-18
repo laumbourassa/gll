@@ -57,7 +57,7 @@ void print_list(gll_list_t* list, void (*print_func)(gll_data_t))
         print_func(gll_iterator_next(it));
     }
     printf("\n");
-    gll_iterator_delete(it);
+    gll_iterator_destroy(it);
 }
 
 // Print functions for different data types

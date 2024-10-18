@@ -36,7 +36,7 @@ void print_list(gll_list_t* list)
         printf("%lu ", (unsigned long)gll_iterator_next(it));
     }
     printf("\n");
-    gll_iterator_delete(it);
+    gll_iterator_destroy(it);
 }
 
 int main(void) {
@@ -118,7 +118,7 @@ int main(void) {
     }
     printf("\n");
 
-    gll_iterator_delete(iterator);
+    gll_iterator_destroy(iterator);
 
     // Delete the lists
     gll_destroy(list, NULL);

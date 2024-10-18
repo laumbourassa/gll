@@ -205,12 +205,12 @@ gll_status_t gll_clear(gll_list_t* list, gll_deallocator_t deallocator);
 gll_iterator_t* gll_iterator_create(gll_list_t* list);
 
 /**
- * @brief Deletes the iterator and frees memory.
+ * @brief Destroys the iterator and frees memory.
  * 
- * @param iterator The iterator to delete.
+ * @param iterator The iterator to destroy.
  * @return 0 on success, -1 on failure.
  */
-gll_status_t gll_iterator_delete(gll_iterator_t* iterator);
+gll_status_t gll_iterator_destroy(gll_iterator_t* iterator);
 
 /**
  * @brief Moves the iterator to the next element in the list and returns its data.

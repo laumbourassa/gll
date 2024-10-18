@@ -38,7 +38,7 @@ typedef struct gll_node
 
 typedef struct gll_list
 {
-    gll_size_t qty;
+    gll_size_t size;
     gll_node_t* head;
     gll_node_t* tail;
 } gll_list_t;
@@ -138,7 +138,7 @@ gll_list_t* gll_clone(gll_list_t* list)
         gll_append(clone, gll_iterator_next(iterator));
     }
     
-    gll_iterator_delete(iterator);
+    gll_iterator_destroy(iterator);
     return clone;
 }
 
@@ -171,7 +171,7 @@ gll_status_t gll_append(gll_list_t* list, gll_data_t data)
     
     node->prev = tail;
 
-    list->qty++;
+    list->size++;
     return 0;
 }
 
@@ -196,7 +196,7 @@ gll_status_t gll_push(gll_list_t* list, gll_data_t data)
     
     node->next = head;
 
-    list->qty++;
+    list->size++;
     return 0;
 }
 
@@ -210,7 +210,7 @@ gll_data_t gll_pop(gll_list_t* list)
     gll_data_t data = node->data;
     list->head = node->next;
     list->head->prev = NULL;
-    list->qty--;
+    list->size--;
     
     free(node);
     
@@ -227,7 +227,7 @@ gll_data_t gll_trim(gll_list_t* list)
     gll_data_t data = node->data;
     list->tail = node->prev;
     list->tail->next = NULL;
-    list->qty--;
+    list->size--;
     
     free(node);
     
@@ -237,7 +237,7 @@ gll_data_t gll_trim(gll_list_t* list)
 gll_size_t gll_size(gll_list_t* list)
 {
     if (!list) return 0;
-    return list->qty;
+    return list->size;
 }
 
 gll_data_t gll_peek(gll_list_t* list)
@@ -273,7 +273,7 @@ gll_index_t gll_find(gll_list_t* list, gll_data_t data, gll_comparator_t compara
     gll_iterator_t* iterator = gll_iterator_create(list);
     gll_index_t index = 0;
 
-    for (; index < list->qty; index++)
+    for (; index < list->size; index++)
     {
         gll_data_t eval = gll_iterator_next(iterator);
 
@@ -283,7 +283,7 @@ gll_index_t gll_find(gll_list_t* list, gll_data_t data, gll_comparator_t compara
         }
     }
 
-    gll_iterator_delete(iterator);
+    gll_iterator_destroy(iterator);
 
     return index;
 }
@@ -291,7 +291,7 @@ gll_index_t gll_find(gll_list_t* list, gll_data_t data, gll_comparator_t compara
 gll_status_t gll_insert(gll_list_t* list, gll_index_t index, gll_data_t data)
 {
     if (!list) return -1;
-    if (index > list->qty) return -1;
+    if (index > list->size) return -1;
 
     gll_status_t status = 0;
 
@@ -300,12 +300,12 @@ gll_status_t gll_insert(gll_list_t* list, gll_index_t index, gll_data_t data)
         // Insert at the head
         status = gll_push(list, data);
     }
-    else if (index == list->qty)
+    else if (index == list->size)
     {
         // Insert at the tail
         status = gll_append(list, data);
     }
-    else if (list->qty/2 >= index)
+    else if (list->size/2 >= index)
     {
         // Index is in the first half
         status = _gll_insert_from_head(list, index, data);
@@ -322,7 +322,7 @@ gll_status_t gll_insert(gll_list_t* list, gll_index_t index, gll_data_t data)
 gll_data_t gll_remove(gll_list_t* list, gll_index_t index)
 {
     if (!list) return -1;
-    if (index > list->qty) return -1;
+    if (index > list->size) return -1;
 
     gll_data_t data = 0;
 
@@ -331,12 +331,12 @@ gll_data_t gll_remove(gll_list_t* list, gll_index_t index)
         // Remove at the head
         data = gll_pop(list);
     }
-    else if (index == list->qty)
+    else if (index == list->size)
     {
         // Remove at the tail
         data = gll_trim(list);
     }
-    else if (list->qty/2 >= index)
+    else if (list->size/2 >= index)
     {
         // Index is in the first half
         data = _gll_remove_from_head(list, index);
@@ -356,7 +356,7 @@ gll_status_t gll_clear(gll_list_t* list, gll_deallocator_t deallocator)
     
     gll_node_t* node = list->head;
     
-    for (gll_index_t i = 0; i < list->qty; i++)
+    for (gll_index_t i = 0; i < list->size; i++)
     {
         if (!node) return -1;
         gll_node_t* next = node->next;
@@ -370,7 +370,7 @@ gll_status_t gll_clear(gll_list_t* list, gll_deallocator_t deallocator)
         node = next;
     }
     
-    list->qty = 0;
+    list->size = 0;
     return 0;
 }
 
@@ -382,7 +382,7 @@ gll_iterator_t* gll_iterator_create(gll_list_t* list)
     iterator->list = list;
 }
 
-gll_status_t gll_iterator_delete(gll_iterator_t* iterator)
+gll_status_t gll_iterator_destroy(gll_iterator_t* iterator)
 {
     if (!iterator) return -1;
     
@@ -502,9 +502,9 @@ static gll_status_t _gll_insert_from_head(gll_list_t* list, gll_index_t index, g
     node->prev = iterator->current->prev;
     iterator->current->prev->next = node;
     iterator->current->prev = node;
-    list->qty++;
+    list->size++;
 
-    gll_iterator_delete(iterator);
+    gll_iterator_destroy(iterator);
 
     return 0;
 }
@@ -513,7 +513,7 @@ static gll_status_t _gll_insert_from_tail(gll_list_t* list, gll_index_t index, g
 {
     gll_iterator_t* iterator = gll_iterator_create(list);
 
-    for (gll_index_t i = list->qty - 1; i >= index; i--)
+    for (gll_index_t i = list->size - 1; i >= index; i--)
     {
         gll_iterator_prev(iterator);
     }
@@ -525,9 +525,9 @@ static gll_status_t _gll_insert_from_tail(gll_list_t* list, gll_index_t index, g
     node->prev = iterator->current->prev;
     iterator->current->prev->next = node;
     iterator->current->prev = node;
-    list->qty++;
+    list->size++;
 
-    gll_iterator_delete(iterator);
+    gll_iterator_destroy(iterator);
 
     return 0;
 }
@@ -544,11 +544,11 @@ static gll_data_t _gll_remove_from_head(gll_list_t* list, gll_index_t index)
 
     iterator->current->prev->next = iterator->current->next;
     iterator->current->next->prev = iterator->current->prev;
-    list->qty--;
+    list->size--;
 
     data = iterator->current->data;
 
-    gll_iterator_delete(iterator);
+    gll_iterator_destroy(iterator);
 
     return data;
 }
@@ -558,18 +558,18 @@ static gll_data_t _gll_remove_from_tail(gll_list_t* list, gll_index_t index)
     gll_data_t data = 0;
     gll_iterator_t* iterator = gll_iterator_create(list);
 
-    for (gll_index_t i = list->qty - 1; i >= index; i--)
+    for (gll_index_t i = list->size - 1; i >= index; i--)
     {
         gll_iterator_prev(iterator);
     }
 
     iterator->current->prev->next = iterator->current->next;
     iterator->current->next->prev = iterator->current->prev;
-    list->qty--;
+    list->size--;
 
     data = iterator->current->data;
 
-    gll_iterator_delete(iterator);
+    gll_iterator_destroy(iterator);
 
     return data;
 }
