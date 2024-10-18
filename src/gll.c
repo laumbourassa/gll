@@ -259,8 +259,7 @@ gll_data_t gll_peek_last(gll_list_t* list)
     return node->data;
 }
 
-// Returns the list size if data isn't found
-gll_index_t gll_find(gll_list_t* list, gll_data_t data)
+gll_index_t gll_find(gll_list_t* list, gll_data_t data, gll_comparator_t comparator)
 {
     if (!list) return 0;
     if (!list->head) return 0;
@@ -270,7 +269,13 @@ gll_index_t gll_find(gll_list_t* list, gll_data_t data)
 
     for (; index < list->qty; index++)
     {
-        if (data == gll_iterator_next(iterator))
+        gll_data_t eval = gll_iterator_next(iterator);
+
+        if (comparator && !comparator(data, eval))
+        {
+            break;
+        }
+        else if (data == eval)
         {
             break;
         }

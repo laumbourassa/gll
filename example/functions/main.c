@@ -76,6 +76,10 @@ int main(void) {
     printf("Trimmed from end: %lu\n", (unsigned long)trimmed);
     print_list(list);
 
+    // Find element
+    gll_index_t index = gll_find(list, GLL_DATA(42), NULL);
+    printf("Found 42 at index: %lu\n", index);
+
     gll_data_t removed = gll_remove(list, 1);
     printf("Removed from index 1: %lu\n", (unsigned long)removed);
     print_list(list);

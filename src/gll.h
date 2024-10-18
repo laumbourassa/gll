@@ -163,9 +163,10 @@ gll_data_t gll_peek_last(gll_list_t* list);
  * 
  * @param list The list to search.
  * @param data The data to find.
- * @return The index of the found data or, 0 if NULL list, list size if not found.
+ * @param comparator Function to compare custom data. If NULL, data will be compared directly.
+ * @return The index of the found data, 0 if NULL list, list size if not found.
  */
-gll_index_t gll_find(gll_list_t* list, gll_data_t data);
+gll_index_t gll_find(gll_list_t* list, gll_data_t data, gll_comparator_t comparator);
 
 /**
  * @brief Inserts data at a specified index in the list.
