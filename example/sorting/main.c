@@ -48,7 +48,7 @@ int main() {
     printf("Before sorting:\n");
     print_list(list);
 
-    // Sort the list using gll_sort with int_comparator
+    // Sort the list using gll_sort with gll_comparator_int32
     gll_sort(list, gll_comparator_int32);
 
     // Print the list after sorting
