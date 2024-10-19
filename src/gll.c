@@ -49,11 +49,15 @@ typedef struct gll_iterator
     gll_node_t* current;
 } gll_iterator_t;
 
+static gll_result_t _gll_comparator_data(gll_data_t data1, gll_data_t data2);
 static gll_result_t _gll_comparator_data_not_equal(gll_data_t data1, gll_data_t data2);
 static gll_status_t _gll_insert_from_head(gll_list_t* list, gll_index_t index, gll_data_t data);
 static gll_status_t _gll_insert_from_tail(gll_list_t* list, gll_index_t index, gll_data_t data);
 static gll_data_t _gll_remove_from_head(gll_list_t* list, gll_index_t index);
 static gll_data_t _gll_remove_from_tail(gll_list_t* list, gll_index_t index);
+static gll_node_t* _gll_split_list(gll_node_t* head);
+static gll_node_t* _gll_sorted_merge(gll_node_t* a, gll_node_t* b, gll_comparator_t comparator);
+static gll_node_t* _gll_merge_sort(gll_node_t* head, gll_comparator_t comparator);
 
 gll_data_t _gll_char_to_data(char data)
 {
@@ -375,6 +379,29 @@ gll_status_t gll_clear(gll_list_t* list, gll_deallocator_t deallocator)
     return 0;
 }
 
+gll_status_t gll_sort(gll_list_t* list, gll_comparator_t comparator)
+{
+    if (!list || !list->head || list->size < 2) return 0;
+
+    if (!comparator)
+    {
+        comparator = _gll_comparator_data;
+    }
+
+    list->head = _gll_merge_sort(list->head, comparator);
+
+    gll_node_t* current = list->head;
+
+    while (current->next != NULL)
+    {
+        current = current->next;
+    }
+
+    list->tail = current;
+
+    return 0;
+}
+
 gll_iterator_t* gll_iterator_create(gll_list_t* list)
 {
     if (!list) return NULL;
@@ -482,6 +509,20 @@ gll_result_t gll_comparator_double(gll_data_t data1, gll_data_t data2)
     return 0;
 }
 
+static gll_result_t _gll_comparator_data(gll_data_t data1, gll_data_t data2)
+{
+    if (data1 > data2)
+    {
+        return 1;
+    }
+    else if (data1 < data2)
+    {
+        return -1;
+    }
+    
+    return 0;
+}
+
 static gll_result_t _gll_comparator_data_not_equal(gll_data_t data1, gll_data_t data2)
 {
     // Returns 0 if equal, else 1
@@ -574,4 +615,62 @@ static gll_data_t _gll_remove_from_tail(gll_list_t* list, gll_index_t index)
     gll_iterator_destroy(iterator);
 
     return data;
+}
+
+static gll_node_t* _gll_split_list(gll_node_t* head)
+{
+    gll_node_t* slow = head;
+    gll_node_t* fast = head->next;
+
+    while (fast)
+    {
+        fast = fast->next;
+
+        if (fast != NULL)
+        {
+            slow = slow->next;
+            fast = fast->next;
+        }
+    }
+
+    gll_node_t* mid = slow->next;
+    slow->next = NULL;
+
+    return mid;
+}
+
+static gll_node_t* _gll_sorted_merge(gll_node_t* a, gll_node_t* b, gll_comparator_t comparator)
+{
+    if (!a) return b;
+    if (!b) return a;
+
+    gll_node_t* result = NULL;
+
+    if (comparator(a->data, b->data) <= 0)
+    {
+        result = a;
+        result->next = _gll_sorted_merge(a->next, b, comparator);
+        result->next->prev = result;
+        result->prev = NULL;
+    }
+    else
+    {
+        result = b;
+        result->next = _gll_sorted_merge(a, b->next, comparator);
+        result->next->prev = result;
+        result->prev = NULL;
+    }
+
+    return result;
+}
+
+static gll_node_t* _gll_merge_sort(gll_node_t* head, gll_comparator_t comparator)
+{
+    if (!head || !head->next) return head;
+
+    gll_node_t* mid = _gll_split_list(head);
+    gll_node_t* left = _gll_merge_sort(head, comparator);
+    gll_node_t* right = _gll_merge_sort(mid, comparator);
+
+    return _gll_sorted_merge(left, right, comparator);
 }
