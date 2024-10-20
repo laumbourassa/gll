@@ -33,7 +33,7 @@ void print_list(gll_list_t* list)
     printf("List: ");
     for (uint32_t i = 0; i < gll_size(list); i++)
     {
-        printf("%lu ", (unsigned long)gll_iterator_next(it));
+        printf("%lu ", (unsigned long)gll_iterator_forward(it));
     }
     printf("\n");
     gll_iterator_destroy(it);
@@ -104,7 +104,7 @@ int main(void) {
     printf("Traverse list using iterator (forward):\n");
     for (uint32_t i = 0; i < gll_size(list); i++)
     {
-        printf("%lu ", (unsigned long)gll_iterator_next(iterator));
+        printf("%lu ", (unsigned long)gll_iterator_forward(iterator));
     }
     printf("\n");
 
@@ -114,7 +114,7 @@ int main(void) {
     printf("Traverse list using iterator (backward):\n");
     for (uint32_t i = 0; i < gll_size(list); i++)
     {
-        printf("%lu ", (unsigned long)gll_iterator_prev(iterator));
+        printf("%lu ", (unsigned long)gll_iterator_backward(iterator));
     }
     printf("\n");
 

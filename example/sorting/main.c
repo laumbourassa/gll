@@ -10,7 +10,7 @@ void print_list(gll_list_t* list)
     printf("List: ");
     for (gll_index_t i = 0; i < size; i++)
     {
-        gll_data_t data = gll_iterator_next(iterator);
+        gll_data_t data = gll_iterator_forward(iterator);
         printf("%d ", (int) data);
     }
     printf("\n");

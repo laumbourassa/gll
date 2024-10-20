@@ -54,7 +54,7 @@ void print_list(gll_list_t* list, void (*print_func)(gll_data_t))
     printf("List: ");
     for (uint32_t i = 0; i < gll_size(list); i++)
     {
-        print_func(gll_iterator_next(it));
+        print_func(gll_iterator_forward(it));
     }
     printf("\n");
     gll_iterator_destroy(it);

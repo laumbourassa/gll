@@ -139,7 +139,7 @@ gll_list_t* gll_clone(gll_list_t* list)
     
     for(gll_index_t i = 0 ; i < size ; i++)
     {
-        gll_append(clone, gll_iterator_next(iterator));
+        gll_append(clone, gll_iterator_forward(iterator));
     }
     
     gll_iterator_destroy(iterator);
@@ -280,7 +280,7 @@ gll_index_t gll_find(gll_list_t* list, gll_data_t data, gll_comparator_t compara
 
     for (; index < list->size; index++)
     {
-        gll_data_t eval = gll_iterator_next(iterator);
+        gll_data_t eval = gll_iterator_forward(iterator);
 
         if (!comparator(data, eval))
         {
@@ -418,7 +418,7 @@ gll_status_t gll_iterator_destroy(gll_iterator_t* iterator)
     return 0;
 }
 
-gll_data_t gll_iterator_next(gll_iterator_t* iterator)
+gll_data_t gll_iterator_forward(gll_iterator_t* iterator)
 {
     if (!iterator) return 0;
 
@@ -436,7 +436,7 @@ gll_data_t gll_iterator_next(gll_iterator_t* iterator)
     return data;
 }
 
-gll_data_t gll_iterator_prev(gll_iterator_t* iterator)
+gll_data_t gll_iterator_backward(gll_iterator_t* iterator)
 {
     if (!iterator) return 0;
 
@@ -535,7 +535,7 @@ static gll_status_t _gll_insert_from_head(gll_list_t* list, gll_index_t index, g
 
     for (gll_index_t i = 0; i <= index; i++)
     {
-        gll_iterator_next(iterator);
+        gll_iterator_forward(iterator);
     }
 
     gll_node_t* node = calloc(1, sizeof(gll_node_t));
@@ -558,7 +558,7 @@ static gll_status_t _gll_insert_from_tail(gll_list_t* list, gll_index_t index, g
 
     for (gll_index_t i = list->size - 1; i >= index; i--)
     {
-        gll_iterator_prev(iterator);
+        gll_iterator_backward(iterator);
     }
 
     gll_node_t* node = calloc(1, sizeof(gll_node_t));
@@ -582,7 +582,7 @@ static gll_data_t _gll_remove_from_head(gll_list_t* list, gll_index_t index)
 
     for (gll_index_t i = 0; i <= index; i++)
     {
-        gll_iterator_next(iterator);
+        gll_iterator_forward(iterator);
     }
 
     iterator->current->prev->next = iterator->current->next;
@@ -603,7 +603,7 @@ static gll_data_t _gll_remove_from_tail(gll_list_t* list, gll_index_t index)
 
     for (gll_index_t i = list->size - 1; i >= index; i--)
     {
-        gll_iterator_prev(iterator);
+        gll_iterator_backward(iterator);
     }
 
     iterator->current->prev->next = iterator->current->next;
