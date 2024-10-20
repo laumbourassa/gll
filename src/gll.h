@@ -197,7 +197,7 @@ gll_data_t gll_remove(gll_list_t* list, gll_index_t index);
 gll_status_t gll_clear(gll_list_t* list, gll_deallocator_t deallocator);
 
 /**
- * @brief Sorts all elements form the list.
+ * @brief Sorts all elements from the list.
  * 
  * @param list The list to sort.
  * @param comparator Function to compare custom data. If NULL, data will be compared directly.
