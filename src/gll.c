@@ -366,7 +366,7 @@ gll_status_t gll_clear(gll_list_t* list, gll_deallocator_t deallocator)
         if (!node) return -1;
         gll_node_t* next = node->next;
 
-        if(deallocator && node->data)
+        if (deallocator && node->data)
         {
             deallocator(node->data);
         }
@@ -538,7 +538,7 @@ static gll_status_t _gll_insert(gll_list_t* list, gll_index_t index, gll_data_t 
 {
     gll_iterator_t* iterator = gll_iterator_create(list);
 
-    if(backward)
+    if (backward)
     {
         for (gll_index_t i = list->size - 1; i >= index; i--)
         {
@@ -572,7 +572,7 @@ static gll_data_t _gll_remove(gll_list_t* list, gll_index_t index, bool backward
     gll_data_t data = 0;
     gll_iterator_t* iterator = gll_iterator_create(list);
 
-    if(backward)
+    if (backward)
     {
         for (gll_index_t i = list->size - 1; i >= index; i--)
         {
