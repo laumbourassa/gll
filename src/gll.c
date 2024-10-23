@@ -27,6 +27,7 @@
 #include <stdlib.h>
 #include <stdio.h>
 #include <string.h>
+#include <stdbool.h>
 #include "gll.h"
 
 typedef struct gll_node gll_node_t;
@@ -52,10 +53,8 @@ typedef struct gll_iterator
 
 static gll_result_t _gll_comparator_data(gll_data_t data1, gll_data_t data2);
 static gll_result_t _gll_comparator_data_not_equal(gll_data_t data1, gll_data_t data2);
-static gll_status_t _gll_insert_from_head(gll_list_t* list, gll_index_t index, gll_data_t data);
-static gll_status_t _gll_insert_from_tail(gll_list_t* list, gll_index_t index, gll_data_t data);
-static gll_data_t _gll_remove_from_head(gll_list_t* list, gll_index_t index);
-static gll_data_t _gll_remove_from_tail(gll_list_t* list, gll_index_t index);
+static gll_status_t _gll_insert(gll_list_t* list, gll_index_t index, gll_data_t data, bool backward);
+static gll_data_t _gll_remove(gll_list_t* list, gll_index_t index, bool backward);
 static gll_node_t* _gll_split_list(gll_node_t* head);
 static gll_node_t* _gll_sorted_merge(gll_node_t* a, gll_node_t* b, gll_comparator_t comparator);
 static gll_node_t* _gll_merge_sort(gll_node_t* head, gll_comparator_t comparator);
@@ -314,12 +313,12 @@ gll_status_t gll_insert(gll_list_t* list, gll_index_t index, gll_data_t data)
     else if (list->size/2 >= index)
     {
         // Index is in the first half
-        status = _gll_insert_from_head(list, index, data);
+        status = _gll_insert(list, index, data, false);
     }
     else
     {
         // Index is in the second half
-        status = _gll_insert_from_tail(list, index, data);
+        status = _gll_insert(list, index, data, true);
     }
 
     return status;
@@ -345,12 +344,12 @@ gll_data_t gll_remove(gll_list_t* list, gll_index_t index)
     else if (list->size/2 >= index)
     {
         // Index is in the first half
-        data = _gll_remove_from_head(list, index);
+        data = _gll_remove(list, index, false);
     }
     else
     {
         // Index is in the second half
-        data = _gll_remove_from_tail(list, index);
+        data = _gll_remove(list, index, true);
     }
 
     return data;
@@ -535,13 +534,23 @@ static gll_result_t _gll_comparator_data_not_equal(gll_data_t data1, gll_data_t 
     return data1 != data2;
 }
 
-static gll_status_t _gll_insert_from_head(gll_list_t* list, gll_index_t index, gll_data_t data)
+static gll_status_t _gll_insert(gll_list_t* list, gll_index_t index, gll_data_t data, bool backward)
 {
     gll_iterator_t* iterator = gll_iterator_create(list);
 
-    for (gll_index_t i = 0; i <= index; i++)
+    if(backward)
     {
-        gll_iterator_forward(iterator);
+        for (gll_index_t i = list->size - 1; i >= index; i--)
+        {
+            gll_iterator_backward(iterator);
+        }
+    }
+    else
+    {
+        for (gll_index_t i = 0; i <= index; i++)
+        {
+            gll_iterator_forward(iterator);
+        }
     }
 
     gll_node_t* node = calloc(1, sizeof(gll_node_t));
@@ -558,58 +567,24 @@ static gll_status_t _gll_insert_from_head(gll_list_t* list, gll_index_t index, g
     return 0;
 }
 
-static gll_status_t _gll_insert_from_tail(gll_list_t* list, gll_index_t index, gll_data_t data)
-{
-    gll_iterator_t* iterator = gll_iterator_create(list);
-
-    for (gll_index_t i = list->size - 1; i >= index; i--)
-    {
-        gll_iterator_backward(iterator);
-    }
-
-    gll_node_t* node = calloc(1, sizeof(gll_node_t));
-    node->data = data;
-
-    node->next = iterator->current;
-    node->prev = iterator->current->prev;
-    iterator->current->prev->next = node;
-    iterator->current->prev = node;
-    list->size++;
-
-    gll_iterator_destroy(iterator);
-
-    return 0;
-}
-
-static gll_data_t _gll_remove_from_head(gll_list_t* list, gll_index_t index)
+static gll_data_t _gll_remove(gll_list_t* list, gll_index_t index, bool backward)
 {
     gll_data_t data = 0;
     gll_iterator_t* iterator = gll_iterator_create(list);
 
-    for (gll_index_t i = 0; i <= index; i++)
+    if(backward)
     {
-        gll_iterator_forward(iterator);
+        for (gll_index_t i = list->size - 1; i >= index; i--)
+        {
+            gll_iterator_backward(iterator);
+        }
     }
-
-    iterator->current->prev->next = iterator->current->next;
-    iterator->current->next->prev = iterator->current->prev;
-    list->size--;
-
-    data = iterator->current->data;
-
-    gll_iterator_destroy(iterator);
-
-    return data;
-}
-
-static gll_data_t _gll_remove_from_tail(gll_list_t* list, gll_index_t index)
-{
-    gll_data_t data = 0;
-    gll_iterator_t* iterator = gll_iterator_create(list);
-
-    for (gll_index_t i = list->size - 1; i >= index; i--)
+    else
     {
-        gll_iterator_backward(iterator);
+        for (gll_index_t i = 0; i <= index; i++)
+        {
+            gll_iterator_forward(iterator);
+        }
     }
 
     iterator->current->prev->next = iterator->current->next;
