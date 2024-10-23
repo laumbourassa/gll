@@ -1,7 +1,7 @@
 /*
  * main.c - Example program demonstrating the use of the Generic Linked List (GLL) library.
  * 
- * Author: Laurent Mailloux-Bourassa
+ * Copyright (c) 2024 Laurent Mailloux-Bourassa
  * 
  * This file is part of the Generic Linked List (GLL) library.
  * 

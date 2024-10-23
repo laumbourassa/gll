@@ -1,7 +1,7 @@
 /*
  * gll.c - Generic Linked List implementation
  * 
- * Author: Laurent Mailloux-Bourassa
+ * Copyright (c) 2024 Laurent Mailloux-Bourassa
  * 
  * This file is part of the Generic Linked List (GLL) library.
  * 
