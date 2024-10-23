@@ -51,13 +51,13 @@ int main()
 
   // Peek at the first and last elements
   printf("First element: %ld\n", (long) gll_peek(list));
-  printf("Last element: %f\n", (long) gll_peek_last(list));
+  printf("Last element: %ld\n", (long) gll_peek_last(list));
 
   // Pop the first element
   printf("Popped element: %ld\n", (long) gll_pop(list));
 
   // When done, destroy the list
-  gll_destroy(list);
+  gll_destroy(list, NULL);
 
   return 0;
 }
