@@ -20,9 +20,9 @@ To use the GLL library, ensure you have a C compiler installed and the necessary
 
 1. Clone the GLL library source files into your project directory.
 2. Include the **gll.h** header file in your project:
-   ```c
-   #include "gll.h"
-   ```
+```c
+#include "gll.h"
+```
 
 ### Compilation
 To compile your program with the GLL library, ensure you link both the **gll.c** and **gll.h** files with your program:
