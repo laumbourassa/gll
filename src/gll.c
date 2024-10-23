@@ -26,6 +26,7 @@
 
 #include <stdlib.h>
 #include <stdio.h>
+#include <string.h>
 #include "gll.h"
 
 typedef struct gll_node gll_node_t;
@@ -507,6 +508,11 @@ gll_result_t gll_comparator_double(gll_data_t data1, gll_data_t data2)
     }
     
     return 0;
+}
+
+gll_result_t gll_comparator_alphabetical(gll_data_t data1, gll_data_t data2)
+{
+    return strcmpi((char*) data1, (char*) data2);
 }
 
 static gll_result_t _gll_comparator_data(gll_data_t data1, gll_data_t data2)

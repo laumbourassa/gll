@@ -281,4 +281,13 @@ gll_result_t gll_comparator_float(gll_data_t data1, gll_data_t data2);
  */
 gll_result_t gll_comparator_double(gll_data_t data1, gll_data_t data2);
 
+/**
+ * @brief Compares two strings alphabetically.
+ * 
+ * @param data1 The first data value to compare.
+ * @param data2 The second data value to compare.
+ * @return Positive if data1 > data2, negative if data1 < data2, 0 if equal.
+ */
+gll_result_t gll_comparator_alphabetical(gll_data_t data1, gll_data_t data2);
+
 #endif /* GLL_H */
