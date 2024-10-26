@@ -54,7 +54,7 @@ static GLL_FORCE_INLINE gll_data_t _gll_uint32_to_data(uint32_t data) {return (g
 static GLL_FORCE_INLINE gll_data_t _gll_uint64_to_data(uint64_t data) {return (gll_data_t) data;};
 static GLL_FORCE_INLINE gll_data_t _gll_float_to_data(float data) {return *(gll_data_t*) &data;};
 static GLL_FORCE_INLINE gll_data_t _gll_double_to_data(double data) {return *(gll_data_t*) &data;};
-//static GLL_FORCE_INLINE gll_data_t _gll_longdouble_to_data(long double data); // Long double can be larger than gll_data_t
+//static GLL_FORCE_INLINE gll_data_t _gll_longdouble_to_data(long double data) {return *(gll_data_t*) &data;}; // Long double can be larger than gll_data_t
 static GLL_FORCE_INLINE gll_data_t _gll_voidptr_to_data(void* data) {return (gll_data_t) data;};
 
 #define GLL_DATA(data)  _Generic((data),                \
