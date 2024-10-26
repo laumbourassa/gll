@@ -31,13 +31,13 @@
 
 #define	GLL_FORCE_INLINE inline __attribute__((always_inline))
 
-typedef struct gll_list gll_list_t;          // Opaque type representing the doubly linked list.
-typedef struct gll_iterator gll_iterator_t;  // Opaque type representing an iterator for the list.
-typedef uintptr_t gll_data_t;                // Type representing the data stored in the list nodes.
-typedef int8_t gll_status_t;
-typedef int32_t gll_result_t;
-typedef size_t gll_size_t;
-typedef size_t gll_index_t;
+typedef struct gll_list gll_list_t;             // Opaque type representing the doubly linked list.
+typedef struct gll_iterator gll_iterator_t;     // Opaque type representing an iterator for the list.
+typedef uintptr_t gll_data_t;                   // Type representing the data stored in the list nodes.
+typedef int8_t gll_status_t;                    // Type indicating if an error occured while executing a function.
+typedef int32_t gll_result_t;                   // Type representing the result of a comparator.
+typedef size_t gll_size_t;                      // Type representing the size of the linked list.
+typedef size_t gll_index_t;                     // Type representing the index of an item in the linked list.
 
 typedef void (*gll_deallocator_t)(gll_data_t data);                             // User-provided deallocator function for custom structures
 typedef gll_result_t (*gll_comparator_t)(gll_data_t data1, gll_data_t data2);   // User-provided comparator function for custom structures
@@ -57,18 +57,18 @@ static GLL_FORCE_INLINE gll_data_t _gll_double_to_data(double data) {return *(gl
 //static GLL_FORCE_INLINE gll_data_t _gll_longdouble_to_data(long double data) {return *(gll_data_t*) &data;}; // Long double can be larger than gll_data_t
 static GLL_FORCE_INLINE gll_data_t _gll_voidptr_to_data(void* data) {return (gll_data_t) data;};
 
-#define GLL_DATA(data)  _Generic((data),                \
-        int8_t: _gll_int8_to_data,                      \
-        int16_t: _gll_int16_to_data,                    \
-        int32_t: _gll_int32_to_data,                    \
-        int64_t: _gll_int64_to_data,                    \
-        uint8_t: _gll_uint8_to_data,                      \
-        uint16_t: _gll_uint16_to_data,                    \
-        uint32_t: _gll_uint32_to_data,                    \
-        uint64_t: _gll_uint64_to_data,                    \
-        float: _gll_float_to_data,                      \
-        double: _gll_double_to_data,                    \
-        default: _gll_voidptr_to_data                   \
+#define GLL_DATA(data)  _Generic((data),        \
+        int8_t: _gll_int8_to_data,              \
+        int16_t: _gll_int16_to_data,            \
+        int32_t: _gll_int32_to_data,            \
+        int64_t: _gll_int64_to_data,            \
+        uint8_t: _gll_uint8_to_data,            \
+        uint16_t: _gll_uint16_to_data,          \
+        uint32_t: _gll_uint32_to_data,          \
+        uint64_t: _gll_uint64_to_data,          \
+        float: _gll_float_to_data,              \
+        double: _gll_double_to_data,            \
+        default: _gll_voidptr_to_data           \
         )(data)
 
 #define GLL_FLOAT(data)         (*(float*) &data)
