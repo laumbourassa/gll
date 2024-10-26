@@ -144,6 +144,10 @@ int main()
 - `gll_result_t gll_comparator_alphabetical(gll_data_t data1, gll_data_t data2);`  
   Compares two strings alphabetically.
 
+#### Conversion Macro
+- `GLL_DATA(data)`  
+  Converts various data types (integers, floats, pointers) to `gll_data_t`, which is used in the list.
+
 ## License
 
 The GLL library is released under the **MIT License**. You are free to use, modify, and distribute it under the terms of the license. See the [MIT License](https://opensource.org/licenses/MIT) for more details.
