@@ -28,6 +28,7 @@
 #include <stdio.h>
 #include <string.h>
 #include <stdbool.h>
+#include <ctype.h>
 #include "gll.h"
 
 typedef struct gll_node gll_node_t;
@@ -511,7 +512,26 @@ gll_result_t gll_comparator_double(gll_data_t data1, gll_data_t data2)
 
 gll_result_t gll_comparator_alphabetical(gll_data_t data1, gll_data_t data2)
 {
-    return strcmpi((char*) data1, (char*) data2);
+    const char* str1 = (const char*) data1;
+    const char* str2 = (const char*) data2;
+
+    while (*str1 && *str2)
+    {
+        // Convert characters to lowercase before comparing
+        char lower1 = tolower((char) *str1);
+        char lower2 = tolower((char) *str2);
+
+        if (lower1 != lower2)
+        {
+            return (lower1 < lower2) ? -1 : 1;
+        }
+
+        str1++;
+        str2++;
+    }
+    
+    // If the loop completes, strings are identical up to the shorter length.
+    return (!(*str1) && !(*str2)) ? 0 : (*str1 ? 1 : -1);
 }
 
 static gll_result_t _gll_comparator_data(gll_data_t data1, gll_data_t data2)
