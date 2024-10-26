@@ -344,6 +344,8 @@ gll_iterator_t* gll_iterator_create(gll_list_t* list)
     
     gll_iterator_t* iterator = calloc(1, sizeof(gll_iterator_t));
     iterator->list = list;
+
+    return iterator;
 }
 
 gll_status_t gll_iterator_destroy(gll_iterator_t* iterator)
