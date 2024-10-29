@@ -44,18 +44,18 @@ typedef gll_result_t (*gll_comparator_t)(gll_data_t data1, gll_data_t data2);   
                                                                                 // Returns positive value if data1 > data2, negative if data1 < data2, 0 if equal
 
 // Conversion functions for various types to gll_data_t
-static GLL_FORCE_INLINE gll_data_t _gll_int8_to_data(int8_t data) {return (gll_data_t) data;};
-static GLL_FORCE_INLINE gll_data_t _gll_int16_to_data(int16_t data) {return (gll_data_t) data;};
-static GLL_FORCE_INLINE gll_data_t _gll_int32_to_data(int32_t data) {return (gll_data_t) data;};
-static GLL_FORCE_INLINE gll_data_t _gll_int64_to_data(int64_t data) {return (gll_data_t) data;};
-static GLL_FORCE_INLINE gll_data_t _gll_uint8_to_data(uint8_t data) {return (gll_data_t) data;};
-static GLL_FORCE_INLINE gll_data_t _gll_uint16_to_data(uint16_t data) {return (gll_data_t) data;};
-static GLL_FORCE_INLINE gll_data_t _gll_uint32_to_data(uint32_t data) {return (gll_data_t) data;};
-static GLL_FORCE_INLINE gll_data_t _gll_uint64_to_data(uint64_t data) {return (gll_data_t) data;};
-static GLL_FORCE_INLINE gll_data_t _gll_float_to_data(float data) {return *(gll_data_t*) &data;};
-static GLL_FORCE_INLINE gll_data_t _gll_double_to_data(double data) {return *(gll_data_t*) &data;};
-//static GLL_FORCE_INLINE gll_data_t _gll_longdouble_to_data(long double data) {return *(gll_data_t*) &data;}; // Long double can be larger than gll_data_t
-static GLL_FORCE_INLINE gll_data_t _gll_voidptr_to_data(void* data) {return (gll_data_t) data;};
+static GLL_FORCE_INLINE gll_data_t _gll_int8_to_data(int8_t data) {return (gll_data_t) data;}
+static GLL_FORCE_INLINE gll_data_t _gll_int16_to_data(int16_t data) {return (gll_data_t) data;}
+static GLL_FORCE_INLINE gll_data_t _gll_int32_to_data(int32_t data) {return (gll_data_t) data;}
+static GLL_FORCE_INLINE gll_data_t _gll_int64_to_data(int64_t data) {return (gll_data_t) data;}
+static GLL_FORCE_INLINE gll_data_t _gll_uint8_to_data(uint8_t data) {return (gll_data_t) data;}
+static GLL_FORCE_INLINE gll_data_t _gll_uint16_to_data(uint16_t data) {return (gll_data_t) data;}
+static GLL_FORCE_INLINE gll_data_t _gll_uint32_to_data(uint32_t data) {return (gll_data_t) data;}
+static GLL_FORCE_INLINE gll_data_t _gll_uint64_to_data(uint64_t data) {return (gll_data_t) data;}
+static GLL_FORCE_INLINE gll_data_t _gll_float_to_data(float data) {return *(gll_data_t*) &data;}
+static GLL_FORCE_INLINE gll_data_t _gll_double_to_data(double data) {return *(gll_data_t*) &data;}
+//static GLL_FORCE_INLINE gll_data_t _gll_longdouble_to_data(long double data) {return *(gll_data_t*) &data;} // Long double can be larger than gll_data_t
+static GLL_FORCE_INLINE gll_data_t _gll_voidptr_to_data(void* data) {return (gll_data_t) data;}
 
 #define GLL_DATA(data)  _Generic((data),        \
         int8_t: _gll_int8_to_data,              \
