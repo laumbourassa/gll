@@ -39,6 +39,8 @@ typedef struct gll_node
 
 typedef struct gll_list
 {
+    gll_comparator_t comparator;
+    gll_deallocator_t deallocator;
     gll_size_t size;
     gll_node_t* head;
     gll_node_t* tail;
@@ -51,16 +53,37 @@ typedef struct gll_iterator
 } gll_iterator_t;
 
 static gll_result_t _gll_comparator_data(gll_data_t data1, gll_data_t data2);
-static gll_result_t _gll_comparator_data_not_equal(gll_data_t data1, gll_data_t data2);
 static gll_status_t _gll_insert(gll_list_t* list, gll_index_t index, gll_data_t data, bool backward);
 static gll_data_t _gll_remove(gll_list_t* list, gll_index_t index, bool backward);
 static gll_node_t* _gll_split_list(gll_node_t* head);
 static gll_node_t* _gll_sorted_merge(gll_node_t* a, gll_node_t* b, gll_comparator_t comparator);
 static gll_node_t* _gll_merge_sort(gll_node_t* head, gll_comparator_t comparator);
 
-gll_list_t* gll_create(void)
+gll_list_t* gll_create(gll_cfg_t* cfg)
 {
-    return calloc(1, sizeof(gll_list_t));
+    gll_comparator_t comparator;
+    gll_deallocator_t deallocator;
+
+    if (cfg)
+    {
+        comparator = cfg->comparator ? cfg->comparator : _gll_comparator_data;
+        deallocator = cfg->deallocator;
+    }
+    else
+    {
+        comparator = _gll_comparator_data;
+        deallocator = NULL;
+    }
+
+    gll_list_t* list = calloc(1, sizeof(gll_list_t));
+
+    if (list)
+    {
+        list->comparator = comparator;
+        list->deallocator = deallocator;
+    }
+
+    return list;
 }
 
 gll_list_t* gll_clone(gll_list_t* list)
@@ -80,9 +103,9 @@ gll_list_t* gll_clone(gll_list_t* list)
     return clone;
 }
 
-gll_status_t gll_destroy(gll_list_t* list, gll_deallocator_t deallocator)
+gll_status_t gll_destroy(gll_list_t* list)
 {
-    if (gll_clear(list, deallocator)) return -1;
+    if (gll_clear(list)) return -1;
     
     free(list);
     return 0;
@@ -198,16 +221,10 @@ gll_data_t gll_peek_last(gll_list_t* list)
     return node->data;
 }
 
-gll_index_t gll_find(gll_list_t* list, gll_data_t data, gll_comparator_t comparator)
+gll_index_t gll_find(gll_list_t* list, gll_data_t data)
 {
     if (!list) return 0;
     if (!list->head) return 0;
-
-    if (!comparator)
-    {
-        // The result of this comparator will be inverted
-        comparator = _gll_comparator_data_not_equal;
-    }
 
     gll_iterator_t* iterator = gll_iterator_create(list);
     gll_index_t index = 0;
@@ -216,7 +233,7 @@ gll_index_t gll_find(gll_list_t* list, gll_data_t data, gll_comparator_t compara
     {
         gll_data_t eval = gll_iterator_forward(iterator);
 
-        if (!comparator(data, eval))
+        if (!list->comparator(data, eval))
         {
             break;
         }
@@ -289,7 +306,7 @@ gll_data_t gll_remove(gll_list_t* list, gll_index_t index)
     return data;
 }
 
-gll_status_t gll_clear(gll_list_t* list, gll_deallocator_t deallocator)
+gll_status_t gll_clear(gll_list_t* list)
 {
     if (!list) return -1;
     
@@ -300,9 +317,9 @@ gll_status_t gll_clear(gll_list_t* list, gll_deallocator_t deallocator)
         if (!node) return -1;
         gll_node_t* next = node->next;
 
-        if (deallocator && node->data)
+        if (list->deallocator && node->data)
         {
-            deallocator(node->data);
+            list->deallocator(node->data);
         }
 
         free(node);
@@ -313,16 +330,11 @@ gll_status_t gll_clear(gll_list_t* list, gll_deallocator_t deallocator)
     return 0;
 }
 
-gll_status_t gll_sort(gll_list_t* list, gll_comparator_t comparator)
+gll_status_t gll_sort(gll_list_t* list)
 {
     if (!list || !list->head || list->size < 2) return 0;
 
-    if (!comparator)
-    {
-        comparator = _gll_comparator_data;
-    }
-
-    list->head = _gll_merge_sort(list->head, comparator);
+    list->head = _gll_merge_sort(list->head, list->comparator);
 
     gll_node_t* current = list->head;
 
@@ -341,7 +353,11 @@ gll_iterator_t* gll_iterator_create(gll_list_t* list)
     if (!list) return NULL;
     
     gll_iterator_t* iterator = calloc(1, sizeof(gll_iterator_t));
-    iterator->list = list;
+
+    if (iterator)
+    {
+        iterator->list = list;
+    }
 
     return iterator;
 }
@@ -481,12 +497,6 @@ static gll_result_t _gll_comparator_data(gll_data_t data1, gll_data_t data2)
     }
     
     return 0;
-}
-
-static gll_result_t _gll_comparator_data_not_equal(gll_data_t data1, gll_data_t data2)
-{
-    // Returns 0 if equal, else 1
-    return data1 != data2;
 }
 
 static gll_status_t _gll_insert(gll_list_t* list, gll_index_t index, gll_data_t data, bool backward)

@@ -41,7 +41,7 @@ void print_list(gll_list_t* list)
 
 int main(void) {
     // Create a new list
-    gll_list_t* list = gll_create();
+    gll_list_t* list = gll_create(NULL);
     if (!list)
     {
         printf("Failed to create list.\n");
@@ -77,7 +77,7 @@ int main(void) {
     print_list(list);
 
     // Find element
-    gll_index_t index = gll_find(list, GLL_DATA(42), NULL);
+    gll_index_t index = gll_find(list, GLL_DATA(42));
     printf("Found 42 at index: %lu\n", index);
 
     gll_data_t removed = gll_remove(list, 1);
@@ -95,7 +95,7 @@ int main(void) {
     print_list(cloned_list);
 
     // Clear the cloned list
-    gll_clear(cloned_list, NULL);
+    gll_clear(cloned_list);
     printf("Cleared the cloned list:\n");
     print_list(cloned_list);
 
@@ -121,8 +121,8 @@ int main(void) {
     gll_iterator_destroy(iterator);
 
     // Delete the lists
-    gll_destroy(list, NULL);
-    gll_destroy(cloned_list, NULL);
+    gll_destroy(list);
+    gll_destroy(cloned_list);
 
     printf("All lists and iterators have been deleted.\n");
     

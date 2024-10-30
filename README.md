@@ -66,19 +66,19 @@ int main()
 ### API Documentation
 
 #### List Management
-- `gll_list_t* gll_create(void);`  
+- `gll_list_t* gll_create(gll_cfg_t* cfg);`  
   Creates and returns a new doubly linked list.
 
 - `gll_list_t* gll_clone(gll_list_t* list);`  
   Copies and returns a new instance of a doubly linked list.
 
-- `gll_status_t gll_destroy(gll_list_t* list, gll_deallocator_t deallocator);`  
+- `gll_status_t gll_destroy(gll_list_t* list);`  
   Destroys the list and frees all allocated memory using a custom deallocator if provided.
 
 - `gll_size_t gll_size(gll_list_t* list);`  
   Returns the number of elements in the list.
 
-- `gll_status_t gll_clear(gll_list_t* list, gll_deallocator_t deallocator);`  
+- `gll_status_t gll_clear(gll_list_t* list);`  
   Clears all elements from the list, keeping the list structure intact.
 
 #### Data Operations
@@ -100,7 +100,7 @@ int main()
 - `gll_data_t gll_peek_last(gll_list_t* list);`  
   Returns the data at the end of the list without removing it.
 
-- `gll_index_t gll_find(gll_list_t* list, gll_data_t data, gll_comparator_t comparator);`  
+- `gll_index_t gll_find(gll_list_t* list, gll_data_t data);`  
   Finds the index of the first occurrence of the given data using a comparator.
 
 - `gll_status_t gll_insert(gll_list_t* list, gll_index_t index, gll_data_t data);`  
@@ -109,7 +109,7 @@ int main()
 - `gll_data_t gll_remove(gll_list_t* list, gll_index_t index);`  
   Removes and returns the data at the specified index.
 
-- `gll_status_t gll_sort(gll_list_t* list, gll_comparator_t comparator);`  
+- `gll_status_t gll_sort(gll_list_t* list);`  
   Sorts the list using a comparator.
 
 #### Iterators

@@ -84,34 +84,35 @@ void print_person_wrapper(gll_data_t data)
 int main(void)
 {
     // 1. Demonstrating usage with integers
-    gll_list_t* int_list = gll_create();
+    gll_list_t* int_list = gll_create(NULL);
     gll_append(int_list, GLL_DATA(10));
     gll_append(int_list, GLL_DATA(20));
     gll_append(int_list, GLL_DATA(30));
     printf("Integer list:\n");
     print_list(int_list, print_int);
-    gll_destroy(int_list, NULL);
+    gll_destroy(int_list);
 
     // 2. Demonstrating usage with floats
-    gll_list_t* float_list = gll_create();
+    gll_list_t* float_list = gll_create(NULL);
     gll_append(float_list, GLL_DATA(1.5f));
     gll_append(float_list, GLL_DATA(2.75f));
     gll_append(float_list, GLL_DATA(3.14f));
     printf("Float list:\n");
     print_list(float_list, print_float);
-    gll_destroy(float_list, NULL);
+    gll_destroy(float_list);
 
     // 3. Demonstrating usage with strings
-    gll_list_t* string_list = gll_create();
+    gll_list_t* string_list = gll_create(NULL);
     gll_append(string_list, GLL_DATA("Hello"));
     gll_append(string_list, GLL_DATA("World"));
     gll_append(string_list, GLL_DATA("GLL"));
     printf("String list:\n");
     print_list(string_list, print_string);
-    gll_destroy(string_list, NULL);
+    gll_destroy(string_list);
 
     // 4. Demonstrating usage with custom structures
-    gll_list_t* person_list = gll_create();
+    gll_cfg_t person_list_cfg = {.comparator = NULL, .deallocator = person_deallocator};
+    gll_list_t* person_list = gll_create(&person_list_cfg);
     
     // Creating custom structure instances
     person_t* p1 = (person_t*)malloc(sizeof(person_t));
@@ -135,7 +136,7 @@ int main(void)
     print_list(person_list, print_person_wrapper);
 
     // Deleting the person list
-    gll_destroy(person_list, person_deallocator);
+    gll_destroy(person_list);
 
     printf("All lists have been processed and deleted.\n");
     

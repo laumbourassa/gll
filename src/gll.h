@@ -43,6 +43,12 @@ typedef void (*gll_deallocator_t)(gll_data_t data);                             
 typedef gll_result_t (*gll_comparator_t)(gll_data_t data1, gll_data_t data2);   // User-provided comparator function for custom structures
                                                                                 // Returns positive value if data1 > data2, negative if data1 < data2, 0 if equal
 
+typedef struct gll_cfg
+{
+    gll_comparator_t comparator;
+    gll_deallocator_t deallocator;
+} gll_cfg_t;
+
 // Conversion functions for various types to gll_data_t
 static GLL_FORCE_INLINE gll_data_t _gll_int8_to_data(int8_t data) {return (gll_data_t) data;}
 static GLL_FORCE_INLINE gll_data_t _gll_int16_to_data(int16_t data) {return (gll_data_t) data;}
@@ -77,9 +83,10 @@ static GLL_FORCE_INLINE gll_data_t _gll_voidptr_to_data(void* data) {return (gll
 /**
  * @brief Creates a new doubly linked list.
  * 
+ * @param cfg The list configuration.
  * @return Pointer to the created gll_list_t or NULL on failure.
  */
-gll_list_t* gll_create(void);
+gll_list_t* gll_create(gll_cfg_t* cfg);
 
 /**
  * @brief Clones an existing list by creating a copy.
@@ -96,7 +103,7 @@ gll_list_t* gll_clone(gll_list_t* list);
  * @param deallocator Function to deallocate any custom data, or NULL.
  * @return 0 on success, -1 on failure.
  */
-gll_status_t gll_destroy(gll_list_t* list, gll_deallocator_t deallocator);
+gll_status_t gll_destroy(gll_list_t* list);
 
 /**
  * @brief Appends data to the end of the list.
@@ -161,10 +168,9 @@ gll_data_t gll_peek_last(gll_list_t* list);
  * 
  * @param list The list to search.
  * @param data The data to find.
- * @param comparator Function to compare custom data. If NULL, data will be compared directly.
  * @return The index of the found data, 0 if NULL list, list size if not found.
  */
-gll_index_t gll_find(gll_list_t* list, gll_data_t data, gll_comparator_t comparator);
+gll_index_t gll_find(gll_list_t* list, gll_data_t data);
 
 /**
  * @brief Inserts data at a specified index in the list.
@@ -189,19 +195,17 @@ gll_data_t gll_remove(gll_list_t* list, gll_index_t index);
  * @brief Clears all elements from the list but keeps the list structure.
  * 
  * @param list The list to clear.
- * @param deallocator Function to deallocate any custom data, or NULL.
  * @return 0 on success, -1 on failure.
  */
-gll_status_t gll_clear(gll_list_t* list, gll_deallocator_t deallocator);
+gll_status_t gll_clear(gll_list_t* list);
 
 /**
  * @brief Sorts all elements from the list.
  * 
  * @param list The list to sort.
- * @param comparator Function to compare custom data. If NULL, data will be compared directly.
  * @return 0 on success, -1 on failure.
  */
-gll_status_t gll_sort(gll_list_t* list, gll_comparator_t comparator);
+gll_status_t gll_sort(gll_list_t* list);
 
 /**
  * @brief Creates an iterator for traversing the list.

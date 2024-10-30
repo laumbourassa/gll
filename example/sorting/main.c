@@ -46,7 +46,8 @@ void print_list(gll_list_t* list)
 
 int main() {
     // Create a new list
-    gll_list_t* list = gll_create();
+    gll_cfg_t cfg = {.comparator = gll_comparator_int32, .deallocator = NULL};
+    gll_list_t* list = gll_create(&cfg);
 
     // Add some unsorted integers to the list
     gll_append(list, GLL_DATA(5));
@@ -74,15 +75,15 @@ int main() {
     printf("Before sorting:\n");
     print_list(list);
 
-    // Sort the list using gll_sort with gll_comparator_int32
-    gll_sort(list, gll_comparator_int32);
+    // Sort the list
+    gll_sort(list);
 
     // Print the list after sorting
     printf("After sorting:\n");
     print_list(list);
 
     // Clean up
-    gll_destroy(list, NULL);
+    gll_destroy(list);
 
     return 0;
 }
