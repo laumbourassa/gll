@@ -40,7 +40,7 @@ gcc -o your_program your_program.c gll.c
 int main()
 {
   // Create a new list
-  gll_list_t* list = gll_create();
+  gll_list_t* list = gll_create(NULL);
 
   // Append data to the list
   gll_append(list, GLL_DATA(42));
@@ -57,7 +57,7 @@ int main()
   printf("Popped element: %ld\n", (long) gll_pop(list));
 
   // When done, destroy the list
-  gll_destroy(list, NULL);
+  gll_destroy(list);
 
   return 0;
 }
