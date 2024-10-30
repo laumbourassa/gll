@@ -92,6 +92,9 @@ gll_list_t* gll_clone(gll_list_t* list)
     
     gll_cfg_t cfg = {.comparator = list->comparator, .deallocator = list->deallocator};
     gll_list_t* clone = gll_create(&cfg);
+
+    if (!clone) return NULL;
+
     gll_iterator_t* iterator = gll_iterator_create(list);
     gll_size_t size = gll_size(list);
     
