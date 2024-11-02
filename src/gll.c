@@ -562,6 +562,7 @@ static gll_data_t _gll_remove(gll_list_t* list, gll_index_t index, bool backward
 
     data = iterator->current->data;
 
+    free(iterator->current);
     gll_iterator_destroy(iterator);
 
     return data;
