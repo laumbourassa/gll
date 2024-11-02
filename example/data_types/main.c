@@ -63,7 +63,7 @@ void print_list(gll_list_t* list, void (*print_func)(gll_data_t))
 // Print functions for different data types
 void print_int(gll_data_t data)
 {
-    printf("%d ", data);
+    printf("%d ", (int) data);
 }
 
 void print_float(gll_data_t data)
