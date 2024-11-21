@@ -185,7 +185,12 @@ gll_data_t gll_pop(gll_list_t* list)
     mtx_lock(&list->mutex);
     
     gll_node_t* node = list->head;
-    if (!node) return 0;
+
+    if (!node)
+    {
+        mtx_unlock(&list->mutex);
+        return 0;
+    }
     
     gll_data_t data = node->data;
     list->head = node->next;
@@ -203,7 +208,12 @@ gll_data_t gll_trim(gll_list_t* list)
     mtx_lock(&list->mutex);
     
     gll_node_t* node = list->tail;
-    if (!node) return 0;
+
+    if (!node)
+    {
+        mtx_unlock(&list->mutex);
+        return 0;
+    }
     
     gll_data_t data = node->data;
     list->tail = node->prev;
@@ -365,7 +375,12 @@ gll_status_t gll_clear(gll_list_t* list)
     
     for (gll_index_t i = 0; i < list->size; i++)
     {
-        if (!node) return -1;
+        if (!node)
+        {
+            mtx_unlock(&list->mutex);
+            return -1;
+        }
+        
         gll_node_t* next = node->next;
 
         if (list->deallocator && node->data)
