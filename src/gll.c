@@ -31,6 +31,9 @@
 #include <stdio.h>
 #include "gll.h"
 
+#define GLL_MUTEX_LOCK(gll)     mtx_lock(&gll->mutex)
+#define GLL_MUTEX_UNLOCK(gll)   mtx_unlock(&gll->mutex)
+
 typedef struct gll_node gll_node_t;
 typedef struct gll_node
 {
@@ -129,7 +132,7 @@ gll_status_t gll_destroy(gll_list_t* list)
 gll_status_t gll_append(gll_list_t* list, gll_data_t data)
 {
     if (!list) return -1;
-    mtx_lock(&list->mutex);
+    GLL_MUTEX_LOCK(list);
     
     gll_node_t* node = calloc(1, sizeof(gll_node_t));
     node->data = data;
@@ -149,14 +152,14 @@ gll_status_t gll_append(gll_list_t* list, gll_data_t data)
     node->prev = tail;
 
     list->size++;
-    mtx_unlock(&list->mutex);
+    GLL_MUTEX_UNLOCK(list);
     return 0;
 }
 
 gll_status_t gll_push(gll_list_t* list, gll_data_t data)
 {
     if (!list) return -1;
-    mtx_lock(&list->mutex);
+    GLL_MUTEX_LOCK(list);
     
     gll_node_t* node = calloc(1, sizeof(gll_node_t));
     node->data = data;
@@ -176,20 +179,20 @@ gll_status_t gll_push(gll_list_t* list, gll_data_t data)
     node->next = head;
 
     list->size++;
-    mtx_unlock(&list->mutex);
+    GLL_MUTEX_UNLOCK(list);
     return 0;
 }
 
 gll_data_t gll_pop(gll_list_t* list)
 {
     if (!list) return 0;
-    mtx_lock(&list->mutex);
+    GLL_MUTEX_LOCK(list);
     
     gll_node_t* node = list->head;
 
     if (!node)
     {
-        mtx_unlock(&list->mutex);
+        GLL_MUTEX_UNLOCK(list);
         return 0;
     }
     
@@ -199,20 +202,20 @@ gll_data_t gll_pop(gll_list_t* list)
     list->size--;
     
     free(node);
-    mtx_unlock(&list->mutex);
+    GLL_MUTEX_UNLOCK(list);
     return data;
 }
 
 gll_data_t gll_trim(gll_list_t* list)
 {
     if (!list) return 0;
-    mtx_lock(&list->mutex);
+    GLL_MUTEX_LOCK(list);
     
     gll_node_t* node = list->tail;
 
     if (!node)
     {
-        mtx_unlock(&list->mutex);
+        GLL_MUTEX_UNLOCK(list);
         return 0;
     }
     
@@ -222,53 +225,53 @@ gll_data_t gll_trim(gll_list_t* list)
     list->size--;
     
     free(node);
-    mtx_unlock(&list->mutex);
+    GLL_MUTEX_UNLOCK(list);
     return data;
 }
 
 gll_size_t gll_size(gll_list_t* list)
 {
     if (!list) return 0;
-    mtx_lock(&list->mutex);
+    GLL_MUTEX_LOCK(list);
 
     gll_size_t size = list->size;
 
-    mtx_unlock(&list->mutex);
+    GLL_MUTEX_UNLOCK(list);
     return size;
 }
 
 gll_data_t gll_peek(gll_list_t* list)
 {
     if (!list) return 0;
-    mtx_lock(&list->mutex);
+    GLL_MUTEX_LOCK(list);
     
     gll_node_t* node = list->head;
     gll_data_t data = node ? node->data : 0;
     
-    mtx_unlock(&list->mutex);
+    GLL_MUTEX_UNLOCK(list);
     return data;
 }
 
 gll_data_t gll_peek_last(gll_list_t* list)
 {
     if (!list) return 0;
-    mtx_lock(&list->mutex);
+    GLL_MUTEX_LOCK(list);
     
     gll_node_t* node = list->tail;
     gll_data_t data = node ? node->data : 0;
     
-    mtx_unlock(&list->mutex);
+    GLL_MUTEX_UNLOCK(list);
     return data;
 }
 
 gll_index_t gll_find(gll_list_t* list, gll_data_t data)
 {
     if (!list) return 0;
-    mtx_lock(&list->mutex);
+    GLL_MUTEX_LOCK(list);
 
     if (!list->head)
     {
-        mtx_unlock(&list->mutex);
+        GLL_MUTEX_UNLOCK(list);
         return 0;
     }
 
@@ -288,18 +291,18 @@ gll_index_t gll_find(gll_list_t* list, gll_data_t data)
 
     gll_iterator_destroy(iterator);
 
-    mtx_unlock(&list->mutex);
+    GLL_MUTEX_UNLOCK(list);
     return index;
 }
 
 gll_status_t gll_insert(gll_list_t* list, gll_index_t index, gll_data_t data)
 {
     if (!list) return -1;
-    mtx_lock(&list->mutex);
+    GLL_MUTEX_LOCK(list);
 
     if (index > list->size)
     {
-        mtx_unlock(&list->mutex);
+        GLL_MUTEX_UNLOCK(list);
         return -1;
     }
 
@@ -326,18 +329,18 @@ gll_status_t gll_insert(gll_list_t* list, gll_index_t index, gll_data_t data)
         status = _gll_insert(list, index, data, true);
     }
 
-    mtx_unlock(&list->mutex);
+    GLL_MUTEX_UNLOCK(list);
     return status;
 }
 
 gll_data_t gll_remove(gll_list_t* list, gll_index_t index)
 {
     if (!list) return -1;
-    mtx_lock(&list->mutex);
+    GLL_MUTEX_LOCK(list);
 
     if (index > list->size)
     {
-        mtx_unlock(&list->mutex);
+        GLL_MUTEX_UNLOCK(list);
         return -1;
     }
 
@@ -364,14 +367,14 @@ gll_data_t gll_remove(gll_list_t* list, gll_index_t index)
         data = _gll_remove(list, index, true);
     }
 
-    mtx_unlock(&list->mutex);
+    GLL_MUTEX_UNLOCK(list);
     return data;
 }
 
 gll_status_t gll_clear(gll_list_t* list)
 {
     if (!list) return -1;
-    mtx_lock(&list->mutex);
+    GLL_MUTEX_LOCK(list);
     
     gll_node_t* node = list->head;
     
@@ -379,7 +382,7 @@ gll_status_t gll_clear(gll_list_t* list)
     {
         if (!node)
         {
-            mtx_unlock(&list->mutex);
+            GLL_MUTEX_UNLOCK(list);
             return -1;
         }
         
@@ -396,18 +399,18 @@ gll_status_t gll_clear(gll_list_t* list)
     
     list->size = 0;
 
-    mtx_unlock(&list->mutex);
+    GLL_MUTEX_UNLOCK(list);
     return 0;
 }
 
 gll_status_t gll_sort(gll_list_t* list)
 {
     if (!list) return 0;
-    mtx_lock(&list->mutex);
+    GLL_MUTEX_LOCK(list);
 
     if (!list->head || list->size < 2)
     {
-        mtx_unlock(&list->mutex);
+        GLL_MUTEX_UNLOCK(list);
         return 0;
     }
 
@@ -422,7 +425,7 @@ gll_status_t gll_sort(gll_list_t* list)
 
     list->tail = current;
 
-    mtx_unlock(&list->mutex);
+    GLL_MUTEX_UNLOCK(list);
     return 0;
 }
 
@@ -458,15 +461,15 @@ gll_status_t gll_iterator_destroy(gll_iterator_t* iterator)
 gll_status_t gll_iterator_forward(gll_iterator_t* iterator, gll_data_t* data)
 {
     if (!iterator || !data) return 0;
-    mtx_lock(&iterator->mutex);
-    mtx_lock(&iterator->list->mutex);
+    GLL_MUTEX_LOCK(iterator);
+    GLL_MUTEX_LOCK(iterator->list);
 
     if (!iterator->list->size)
     {
         iterator->current = NULL;
 
-        mtx_unlock(&iterator->list->mutex);
-        mtx_unlock(&iterator->mutex);
+        GLL_MUTEX_UNLOCK(iterator->list);
+        GLL_MUTEX_UNLOCK(iterator);
         return 0;
     }
 
@@ -480,31 +483,31 @@ gll_status_t gll_iterator_forward(gll_iterator_t* iterator, gll_data_t* data)
     }
     else
     {
-        mtx_unlock(&iterator->list->mutex);
-        mtx_unlock(&iterator->mutex);
+        GLL_MUTEX_UNLOCK(iterator->list);
+        GLL_MUTEX_UNLOCK(iterator);
         (*data) = 0;
         return 0;
     }
 
     (*data) = iterator->current->data;
     
-    mtx_unlock(&iterator->list->mutex);
-    mtx_unlock(&iterator->mutex);
+    GLL_MUTEX_UNLOCK(iterator->list);
+    GLL_MUTEX_UNLOCK(iterator);
     return 1;
 }
 
 gll_status_t gll_iterator_backward(gll_iterator_t* iterator, gll_data_t* data)
 {
     if (!iterator || !data) return 0;
-    mtx_lock(&iterator->mutex);
-    mtx_lock(&iterator->list->mutex);
+    GLL_MUTEX_LOCK(iterator);
+    GLL_MUTEX_LOCK(iterator->list);
 
     if (!iterator->list->size)
     {
         iterator->current = NULL;
 
-        mtx_unlock(&iterator->list->mutex);
-        mtx_unlock(&iterator->mutex);
+        GLL_MUTEX_UNLOCK(iterator->list);
+        GLL_MUTEX_UNLOCK(iterator);
         return 0;
     }
 
@@ -518,27 +521,27 @@ gll_status_t gll_iterator_backward(gll_iterator_t* iterator, gll_data_t* data)
     }
     else
     {
-        mtx_unlock(&iterator->list->mutex);
-        mtx_unlock(&iterator->mutex);
+        GLL_MUTEX_UNLOCK(iterator->list);
+        GLL_MUTEX_UNLOCK(iterator);
         (*data) = 0;
         return 0;
     }
 
     (*data) = iterator->current->data;
     
-    mtx_unlock(&iterator->list->mutex);
-    mtx_unlock(&iterator->mutex);
+    GLL_MUTEX_UNLOCK(iterator->list);
+    GLL_MUTEX_UNLOCK(iterator);
     return 1;
 }
 
 gll_status_t gll_iterator_reset(gll_iterator_t* iterator)
 {
     if (!iterator) return -1;
-    mtx_lock(&iterator->mutex);
+    GLL_MUTEX_LOCK(iterator);
     
     iterator->current = NULL;
 
-    mtx_unlock(&iterator->mutex);
+    GLL_MUTEX_UNLOCK(iterator);
     return 0;
 }
 
