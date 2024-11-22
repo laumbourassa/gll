@@ -364,7 +364,7 @@ gll_data_t gll_remove(gll_list_t* list, gll_index_t index)
         // Remove at the head
         data = gll_pop(list);
     }
-    else if (index == list->size)
+    else if (index == list->size - 1)
     {
         // Remove at the tail
         data = gll_trim(list);
@@ -690,8 +690,16 @@ static gll_data_t _gll_remove(gll_list_t* list, gll_index_t index, bool backward
         while ((index >= i++) && gll_iterator_forward(iterator, &dump));
     }
 
-    iterator->current->prev->next = iterator->current->next;
-    iterator->current->next->prev = iterator->current->prev;
+    if (iterator->current->prev)
+    {
+        iterator->current->prev->next = iterator->current->next;
+    }
+
+    if (iterator->current->next)
+    {
+        iterator->current->next->prev = iterator->current->prev;
+    }
+
     list->size--;
 
     data = iterator->current->data;
