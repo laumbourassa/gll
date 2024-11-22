@@ -31,8 +31,10 @@
 #include <stdio.h>
 #include "gll.h"
 
-#define GLL_MUTEX_LOCK(gll)     mtx_lock(&gll->mutex)
-#define GLL_MUTEX_UNLOCK(gll)   mtx_unlock(&gll->mutex)
+#define GLL_MUTEX_CREATE(gll)           (thrd_success == mtx_init(&gll->mutex, mtx_plain))
+#define GLL_MUTEX_CREATE_RECURSIVE(gll) (thrd_success == mtx_init(&gll->mutex, mtx_plain | mtx_recursive))
+#define GLL_MUTEX_LOCK(gll)             (mtx_lock(&gll->mutex))
+#define GLL_MUTEX_UNLOCK(gll)           (mtx_unlock(&gll->mutex))
 
 typedef struct gll_node gll_node_t;
 typedef struct gll_node
@@ -86,7 +88,7 @@ gll_list_t* gll_create(gll_cfg_t* cfg)
 
     if (list)
     {
-        if (thrd_success != mtx_init(&list->mutex, mtx_plain | mtx_recursive))
+        if (!GLL_MUTEX_CREATE_RECURSIVE(list))
         {
             free(list);
             return NULL;
@@ -439,7 +441,7 @@ gll_iterator_t* gll_iterator_create(gll_list_t* list)
     {
         iterator->list = list;
 
-        if (thrd_success != mtx_init(&iterator->mutex, mtx_plain))
+        if (!GLL_MUTEX_CREATE(iterator))
         {
             free(iterator);
             return NULL;
