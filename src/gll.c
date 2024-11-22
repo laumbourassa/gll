@@ -456,7 +456,7 @@ gll_status_t gll_iterator_destroy(gll_iterator_t* iterator)
 {
     if (!iterator) return -1;
     
-    mtx_destroy(&iterator->mutex);
+    GLL_MUTEX_DESTROY(iterator);
     free(iterator);
     return 0;
 }
