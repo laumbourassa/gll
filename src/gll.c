@@ -201,7 +201,12 @@ gll_data_t gll_pop(gll_list_t* list)
     
     gll_data_t data = node->data;
     list->head = node->next;
-    list->head->prev = NULL;
+
+    if (list->head)
+    {
+        list->head->prev = NULL;
+    }
+
     list->size--;
     
     free(node);
@@ -224,7 +229,12 @@ gll_data_t gll_trim(gll_list_t* list)
     
     gll_data_t data = node->data;
     list->tail = node->prev;
-    list->tail->next = NULL;
+
+    if (list->tail)
+    {
+        list->tail->next = NULL;
+    }
+
     list->size--;
     
     free(node);
