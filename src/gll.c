@@ -33,6 +33,7 @@
 
 #define GLL_MUTEX_CREATE(gll)           (thrd_success == mtx_init(&gll->mutex, mtx_plain))
 #define GLL_MUTEX_CREATE_RECURSIVE(gll) (thrd_success == mtx_init(&gll->mutex, mtx_plain | mtx_recursive))
+#define GLL_MUTEX_DESTROY(gll)          (mtx_destroy(&gll->mutex))
 #define GLL_MUTEX_LOCK(gll)             (mtx_lock(&gll->mutex))
 #define GLL_MUTEX_UNLOCK(gll)           (mtx_unlock(&gll->mutex))
 
@@ -126,7 +127,7 @@ gll_status_t gll_destroy(gll_list_t* list)
 {
     if (gll_clear(list)) return -1;
     
-    mtx_destroy(&list->mutex);
+    GLL_MUTEX_DESTROY(list);
     free(list);
     return 0;
 }
