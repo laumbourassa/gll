@@ -227,17 +227,19 @@ gll_status_t gll_iterator_destroy(gll_iterator_t* iterator);
  * @brief Moves the iterator to the next element in the list and returns its data.
  * 
  * @param iterator The iterator to advance.
- * @return The data of the next element or 0 if the iterator is NULL.
+ * @param data Pointer to the variable holding the data.
+ * @return 1 on successful retrieval, 0 when no data left.
  */
-gll_data_t gll_iterator_forward(gll_iterator_t* iterator);
+gll_status_t gll_iterator_forward(gll_iterator_t* iterator, gll_data_t* data);
 
 /**
  * @brief Moves the iterator to the previous element in the list and returns its data.
  * 
  * @param iterator The iterator to reverse.
- * @return The data of the previous element or 0 if the iterator is NULL.
+ * @param data Pointer to the variable holding the data.
+ * @return 1 on successful retrieval, 0 when no data left.
  */
-gll_data_t gll_iterator_backward(gll_iterator_t* iterator);
+gll_status_t gll_iterator_backward(gll_iterator_t* iterator, gll_data_t* data);
 
 /**
  * @brief Resets the iterator to the start of the list.

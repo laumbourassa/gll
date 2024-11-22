@@ -28,6 +28,7 @@
 #include <stdbool.h>
 #include <ctype.h>
 #include <threads.h>
+#include <stdio.h>
 #include "gll.h"
 
 typedef struct gll_node gll_node_t;
@@ -105,11 +106,11 @@ gll_list_t* gll_clone(gll_list_t* list)
     if (!clone) return NULL;
 
     gll_iterator_t* iterator = gll_iterator_create(list);
-    gll_size_t size = gll_size(list);
-    
-    for(gll_index_t i = 0 ; i < size ; i++)
+
+    gll_data_t data;
+    while (gll_iterator_forward(iterator, &data))
     {
-        gll_append(clone, gll_iterator_forward(iterator));
+        gll_append(clone, data);
     }
     
     gll_iterator_destroy(iterator);
@@ -272,16 +273,17 @@ gll_index_t gll_find(gll_list_t* list, gll_data_t data)
     }
 
     gll_iterator_t* iterator = gll_iterator_create(list);
+
+    gll_data_t eval;
     gll_index_t index = 0;
-
-    for (; index < list->size; index++)
+    while (gll_iterator_forward(iterator, &eval))
     {
-        gll_data_t eval = gll_iterator_forward(iterator);
-
         if (!list->comparator(data, eval))
         {
             break;
         }
+
+        index++;
     }
 
     gll_iterator_destroy(iterator);
@@ -453,48 +455,80 @@ gll_status_t gll_iterator_destroy(gll_iterator_t* iterator)
     return 0;
 }
 
-gll_data_t gll_iterator_forward(gll_iterator_t* iterator)
+gll_status_t gll_iterator_forward(gll_iterator_t* iterator, gll_data_t* data)
 {
-    if (!iterator) return 0;
+    if (!iterator || !data) return 0;
     mtx_lock(&iterator->mutex);
     mtx_lock(&iterator->list->mutex);
 
-    if (iterator->current && iterator->current->next)
+    if (!iterator->list->size)
+    {
+        iterator->current = NULL;
+
+        mtx_unlock(&iterator->list->mutex);
+        mtx_unlock(&iterator->mutex);
+        return 0;
+    }
+
+    if (!iterator->current)
+    {
+        iterator->current = iterator->list->head;
+    }
+    else if (iterator->current->next)
     {
         iterator->current = iterator->current->next;
     }
     else
     {
-        iterator->current = iterator->list->head;
+        mtx_unlock(&iterator->list->mutex);
+        mtx_unlock(&iterator->mutex);
+        (*data) = 0;
+        return 0;
     }
 
-    gll_data_t data = iterator->current ? iterator->current->data : 0;
+    (*data) = iterator->current->data;
     
     mtx_unlock(&iterator->list->mutex);
     mtx_unlock(&iterator->mutex);
-    return data;
+    return 1;
 }
 
-gll_data_t gll_iterator_backward(gll_iterator_t* iterator)
+gll_status_t gll_iterator_backward(gll_iterator_t* iterator, gll_data_t* data)
 {
-    if (!iterator) return 0;
+    if (!iterator || !data) return 0;
     mtx_lock(&iterator->mutex);
     mtx_lock(&iterator->list->mutex);
 
-    if (iterator->current && iterator->current->prev)
+    if (!iterator->list->size)
+    {
+        iterator->current = NULL;
+
+        mtx_unlock(&iterator->list->mutex);
+        mtx_unlock(&iterator->mutex);
+        return 0;
+    }
+
+    if (!iterator->current)
+    {
+        iterator->current = iterator->list->tail;
+    }
+    else if (iterator->current->prev)
     {
         iterator->current = iterator->current->prev;
     }
     else
     {
-        iterator->current = iterator->list->tail;
+        mtx_unlock(&iterator->list->mutex);
+        mtx_unlock(&iterator->mutex);
+        (*data) = 0;
+        return 0;
     }
 
-    gll_data_t data = iterator->current ? iterator->current->data : 0;
+    (*data) = iterator->current->data;
     
     mtx_unlock(&iterator->list->mutex);
     mtx_unlock(&iterator->mutex);
-    return data;
+    return 1;
 }
 
 gll_status_t gll_iterator_reset(gll_iterator_t* iterator)
@@ -596,20 +630,17 @@ static gll_result_t _gll_comparator_data(gll_data_t data1, gll_data_t data2)
 static gll_status_t _gll_insert(gll_list_t* list, gll_index_t index, gll_data_t data, bool backward)
 {
     gll_iterator_t* iterator = gll_iterator_create(list);
+    gll_data_t dump;
 
     if (backward)
     {
-        for (gll_index_t i = list->size - 1; i >= index; i--)
-        {
-            gll_iterator_backward(iterator);
-        }
+        gll_index_t i = list->size - 1;
+        while ((index <= i--) && gll_iterator_backward(iterator, &dump));
     }
     else
     {
-        for (gll_index_t i = 0; i <= index; i++)
-        {
-            gll_iterator_forward(iterator);
-        }
+        gll_index_t i = 0;
+        while ((index >= i++) && gll_iterator_forward(iterator, &dump));
     }
 
     gll_node_t* node = calloc(1, sizeof(gll_node_t));
@@ -630,20 +661,17 @@ static gll_data_t _gll_remove(gll_list_t* list, gll_index_t index, bool backward
 {
     gll_data_t data = 0;
     gll_iterator_t* iterator = gll_iterator_create(list);
+    gll_data_t dump;
 
     if (backward)
     {
-        for (gll_index_t i = list->size - 1; i >= index; i--)
-        {
-            gll_iterator_backward(iterator);
-        }
+        gll_index_t i = list->size - 1;
+        while ((index <= i--) && gll_iterator_backward(iterator, &dump));
     }
     else
     {
-        for (gll_index_t i = 0; i <= index; i++)
-        {
-            gll_iterator_forward(iterator);
-        }
+        gll_index_t i = 0;
+        while ((index >= i++) && gll_iterator_forward(iterator, &dump));
     }
 
     iterator->current->prev->next = iterator->current->next;

@@ -51,10 +51,11 @@ void print_person(person_t* person)
 void print_list(gll_list_t* list, void (*print_func)(gll_data_t))
 {
     gll_iterator_t* it = gll_iterator_create(list);
+    gll_data_t data;
     printf("List: ");
-    for (uint32_t i = 0; i < gll_size(list); i++)
+    while (gll_iterator_forward(it, &data))
     {
-        print_func(gll_iterator_forward(it));
+        print_func(data);
     }
     printf("\n");
     gll_iterator_destroy(it);

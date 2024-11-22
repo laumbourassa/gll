@@ -31,12 +31,11 @@
 void print_list(gll_list_t* list)
 {
     gll_iterator_t* iterator = gll_iterator_create(list);
-    gll_size_t size = gll_size(list);
+    gll_data_t data;
 
     printf("List: ");
-    for (gll_index_t i = 0; i < size; i++)
+    while (gll_iterator_forward(iterator, &data))
     {
-        gll_data_t data = gll_iterator_forward(iterator);
         printf("%d ", (int) data);
     }
     printf("\n");
