@@ -200,7 +200,16 @@ gll_data_t gll_pop(gll_list_t* list)
     }
     
     gll_data_t data = node->data;
-    list->head = node->next;
+
+    if (list->head == list->tail)
+    {
+        list->head = NULL;
+        list->tail = NULL;
+    }
+    else
+    {
+        list->head = node->next;
+    }
 
     if (list->head)
     {
@@ -228,7 +237,16 @@ gll_data_t gll_trim(gll_list_t* list)
     }
     
     gll_data_t data = node->data;
-    list->tail = node->prev;
+
+    if (list->head == list->tail)
+    {
+        list->head = NULL;
+        list->tail = NULL;
+    }
+    else
+    {
+        list->tail = node->prev;
+    }
 
     if (list->tail)
     {
@@ -351,7 +369,7 @@ gll_data_t gll_remove(gll_list_t* list, gll_index_t index)
     if (!list) return -1;
     GLL_MUTEX_LOCK(list);
 
-    if (index > list->size)
+    if (index >= list->size)
     {
         GLL_MUTEX_UNLOCK(list);
         return -1;
